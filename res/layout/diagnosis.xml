@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" 
+android:background="#99ddff" android:layout_width="fill_parent" android:layout_weight="1" android:layout_height="wrap_content" android:id="@+id/linearDiagnosis" android:orientation="vertical">
+	<View android:layout_height="2dip" android:layout_width="fill_parent" android:background="#CCC"/>
+	<LinearLayout android:layout_height="wrap_content" android:layout_width="fill_parent">
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="初步诊断:" android:textColor="#000"></TextView>
+        <Spinner android:layout_width="200px" android:layout_height="wrap_content" android:id="@+id/spinPrimaryDiagnosis"></Spinner>
+        <TextView android:id="@+id/textView1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="病情大类:" android:textColor="#000"></TextView>
+        <Spinner android:id="@+id/spinCaseName" android:layout_width="wrap_content" android:layout_height="wrap_content"></Spinner>
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#000" android:text="病情子类:"></TextView>
+        <Spinner android:layout_height="wrap_content" android:layout_width="200px"  android:id="@+id/spinIllnessJudgement"></Spinner>
+        <TextView android:id="@+id/textView36" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="急救效果:" android:textColor="#000"></TextView>
+        <Spinner android:layout_width="200px" android:layout_height="wrap_content" android:id="@+id/spinFirstAidEffect"></Spinner>
+    </LinearLayout>
+	
+
+	<View android:layout_height="2dip" android:layout_width="fill_parent" android:background="#ccc"/>
+    <LinearLayout android:layout_width="fill_parent" android:id="@+id/linearLayoutScheme" android:layout_height="300px">
+        <TextView android:layout_width="30px" android:layout_height="fill_parent" android:textColor="#000" android:id="@+id/textViewScheme" android:layout_gravity="center_vertical" android:textSize="18px" android:lines="4" android:gravity="center" android:text="处理原则"></TextView>
+        <View android:id="@+id/view2" android:layout_height="wrap_content" android:layout_width="2dip" android:background="#ccc"></View>
+        <TextView android:layout_width="wrap_content" android:layout_weight="1" android:layout_height="fill_parent" android:textColor="#000" android:id="@+id/txtCureMethod" android:textSize="18px"></TextView>
+    </LinearLayout>
+	<View android:layout_height="2dip" android:layout_width="fill_parent" android:background="#CCC"/>
+</LinearLayout>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="30dp"
+        android:layout_gravity="center_horizontal">
+        <TableRow >
+            <TextView
+
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:text="姓名" android:layout_gravity="center_vertical"/>
+            <EditText
+            android:id="@+id/addPatName"
+            android:layout_width="220dp"
+            android:layout_height="wrap_content" />
+        </TableRow>
+        <TableRow>
+            <TextView
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="性别"
+                android:layout_gravity="center_vertical"/>
+            <RadioGroup
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/addPatSex"
+                android:orientation="horizontal">
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="男"
+                    android:id="@+id/addPatSexMan"/>
+                <RadioButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="女"
+                    android:id="@+id/addPatSexWoman"/>
+            </RadioGroup>
+        </TableRow>
+        <TableRow><TextView
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="年龄" android:layout_gravity="center_vertical"/>
+            <EditText
+                android:id="@+id/addPatAge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="numberSigned"/>
+        </TableRow>
+        <TableRow><TextView
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="联系电话" android:layout_gravity="center_vertical"/>
+            <EditText
+                android:id="@+id/addPatPhone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="phone"/>
+        </TableRow>
+        <TableRow><TextView
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="去向" android:layout_gravity="center_vertical"/>
+
+            <Spinner
+                android:id="@+id/addCmbToWhere"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+
+        </TableRow>
+        <TableRow><TextView
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="处理结果" android:layout_gravity="center_vertical"/>
+            <EditText
+                android:id="@+id/addPatDoState"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </TableRow>
+        <TableRow><TextView
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="住址" android:layout_gravity="center_vertical"/>
+            <EditText
+                android:id="@+id/addPatAddress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </TableRow>
+    </TableLayout>
+</LinearLayout>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" 
+android:background="#99ddff" android:layout_width="fill_parent" android:layout_weight="1" android:layout_height="wrap_content" android:id="@+id/linearPhyCheck" android:orientation="vertical">
+	<View android:layout_height="2dip" android:layout_width="fill_parent" android:background="#ccc"/>
+	<LinearLayout android:layout_width="fill_parent" 
+		android:layout_weight="1" android:layout_height="290px">
+        <TextView android:id="@+id/textView14" android:layout_width="30px" android:layout_height="fill_parent" android:textColor="#000" android:textSize="18px" android:lines="4" android:gravity="center" android:text="体　　检"></TextView>
+        <View android:id="@+id/view2" android:layout_height="wrap_content" android:layout_width="2dip" android:background="#ccc"></View>
+        <LinearLayout android:layout_width="wrap_content" android:layout_height="match_parent" android:id="@+id/linearLayout17" android:layout_weight="1" android:orientation="vertical">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/linearLayout18">
+                <TextView android:id="@+id/textView15" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#000" android:text="体温:"></TextView>
+                <EditText android:maxLength="4" android:layout_height="wrap_content" android:layout_width="60px" android:text="37" android:gravity="right" android:id="@+id/txtTemprature" android:maxWidth="60px" android:maxLines="1" android:selectAllOnFocus="true" android:inputType="numberDecimal"></EditText>
+                <TextView android:id="@+id/textView16" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#000" android:text="°C　　心率:"></TextView>
+                <EditText android:maxLength="3" android:layout_height="wrap_content" android:layout_width="60px" android:text="70" android:gravity="right" android:id="@+id/txtPulse" android:maxWidth="60px" android:maxLines="1" android:selectAllOnFocus="true" android:inputType="number"></EditText>
+                <TextView android:id="@+id/textView17" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#000" android:text="次/分　　呼吸:"></TextView>
+                <EditText android:maxLength="3" android:layout_height="wrap_content" android:layout_width="60px" android:text="20" android:gravity="right" android:id="@+id/txtRespiration" android:maxWidth="60px" android:maxLines="1" android:selectAllOnFocus="true" android:inputType="number"></EditText>
+                <TextView android:id="@+id/textView18" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#000" android:text="次/分　　血压:"></TextView>
+                <EditText android:maxLength="3" android:layout_height="wrap_content" android:layout_width="60px" android:text="120" android:gravity="right" android:id="@+id/txtMaxBP" android:maxWidth="60px" android:maxLines="1" android:selectAllOnFocus="true" android:inputType="number"></EditText>
+                <TextView android:id="@+id/textView19" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="/" android:textColor="#000"></TextView>
+                <EditText android:maxLength="3" android:layout_height="wrap_content" android:layout_width="60px" android:text="80" android:gravity="right" android:id="@+id/txtMinBP" android:maxWidth="60px" android:maxLines="1" android:selectAllOnFocus="true" android:inputType="number"></EditText>
+                <TextView android:id="@+id/textView57" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="(mm/Hg)" android:textColor="#000"></TextView>
+                <TextView android:id="@+id/textView20" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="　　　　神志:" android:textColor="#000"></TextView>
+                <Spinner android:layout_height="wrap_content" android:id="@+id/spinMind" android:layout_width="120px"></Spinner>
+            </LinearLayout>
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/linearLayout19">
+                <TextView android:id="@+id/textView21" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#000" android:text="瞳孔(mm)　左:"></TextView>
+                <EditText android:maxLength="4" android:layout_height="wrap_content" android:layout_width="60px" android:id="@+id/txtLeftPupil" android:maxWidth="60px" android:maxLines="1" android:selectAllOnFocus="true" android:inputType="numberDecimal"></EditText>
+                <TextView android:id="@+id/textView58" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#000" android:text="右:"></TextView>
+                <EditText android:maxLength="4" android:layout_height="wrap_content" android:layout_width="60px" android:id="@+id/txtRightPupil" android:maxWidth="60px" android:maxLines="1" android:selectAllOnFocus="true" android:inputType="numberDecimal"></EditText>
+                <TextView android:layout_height="wrap_content" android:id="@+id/textView59" android:text="备注:" android:layout_width="wrap_content" android:textColor="#000"></TextView>
+                <EditText android:layout_height="wrap_content" android:layout_width="200px" android:id="@+id/txtPupilRemark" android:maxWidth="200px" android:maxLines="1"></EditText>
+                <TextView android:id="@+id/textView22" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="对光反射:" android:textColor="#000"></TextView>
+                <EditText android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1" android:id="@+id/txtLightReflex" android:maxLines="1"></EditText>
+                <TextView android:id="@+id/textView23" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="头颈部:" android:textColor="#000"></TextView>
+                <EditText android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1" android:id="@+id/txtHeadAndNeck"></EditText>
+            </LinearLayout>
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/linearLayout20">
+                <TextView android:id="@+id/textView24" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="心脏:" android:textColor="#000"></TextView>
+                <EditText android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1" android:id="@+id/txtHeart" android:maxLines="1"></EditText>
+                <TextView android:id="@+id/textView25" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="双肺:" android:textColor="#000"></TextView>
+                <EditText android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1" android:id="@+id/txtLung" android:maxLines="1"></EditText>
+            </LinearLayout>
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/linearLayout21">
+                <TextView android:id="@+id/textView26" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="胸部:" android:textColor="#000"></TextView>
+                <EditText android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1" android:id="@+id/txtChest" android:maxLines="1"></EditText>
+                <TextView android:id="@+id/textView27" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="腹部:" android:textColor="#000"></TextView>
+                <EditText android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1" android:id="@+id/txtAbdmon" android:maxLines="1"></EditText>
+            </LinearLayout>
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/linearLayout22">
+                <TextView android:id="@+id/textView28" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="四肢脊柱:" android:textColor="#000"></TextView>
+                <EditText android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1" android:id="@+id/txtExtremitiesAndSpine" android:maxLines="1"></EditText>
+            </LinearLayout>
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/linearLayout23">
+                <TextView android:id="@+id/textView29" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="其他:" android:textColor="#000"></TextView>
+                <EditText android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_weight="1" android:id="@+id/txtPhyChkOthers" android:maxLines="1"></EditText>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+	<View android:layout_height="2dip" android:layout_width="fill_parent" android:background="#ccc"/>
+    <LinearLayout android:layout_height="wrap_content" android:id="@+id/linearLayout24" android:layout_width="fill_parent">
+        <TextView android:id="@+id/textView30" android:layout_height="wrap_content" android:layout_width="wrap_content" android:textColor="#000" android:text="心电图　:"></TextView>
+        <EditText android:layout_weight="2" android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/txtCardiogram" android:maxLines="1"></EditText>
+        <TextView android:id="@+id/textView31" android:layout_height="wrap_content" android:layout_width="wrap_content" android:textColor="#000" android:text="　　血糖:"></TextView>
+        <EditText android:layout_weight="1" android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/txtGlu" android:maxLines="1"></EditText>
+        <TextView android:id="@+id/textView32" android:layout_height="wrap_content" android:layout_width="wrap_content" android:textColor="#000" android:text="　　SPo2:"></TextView>
+        <EditText android:layout_weight="1" android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/txtSpo2" android:maxLines="1"></EditText>
+        <TextView android:id="@+id/textView33" android:text="%　" android:layout_height="wrap_content" android:layout_width="wrap_content" android:textColor="#000"></TextView>
+    </LinearLayout>
+    <View android:layout_height="2dip" android:layout_width="fill_parent" android:background="#ccc"/>
+</LinearLayout>

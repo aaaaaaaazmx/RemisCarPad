@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="40dp"
+    android:orientation="horizontal"
+    android:background="@drawable/underline">
+    <View
+        style = "@style/vertical_layout"
+        android:visibility="visible" />
+    <TextView
+        android:id="@+id/listPatName"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|center_vertical"
+        android:background="@android:color/transparent"
+        android:gravity="center_vertical|center_horizontal"
+        android:textColor="#912CEE"
+        android:textSize="14sp" />
+    <View
+        style = "@style/vertical_layout"
+        android:visibility="visible" />
+    <TextView
+        android:id="@+id/listPatSex"
+        android:layout_width="30dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|center_vertical"
+        android:gravity="center_vertical|center_horizontal"
+        android:textColor="#912CEE"
+        android:textSize="14sp" />
+    <View
+        style = "@style/vertical_layout"
+        android:visibility="visible" />
+    <TextView
+        android:id="@+id/listPatAge"
+        android:layout_width="30dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|center_vertical"
+        android:gravity="center_vertical|center_horizontal"
+        android:textColor="#912CEE"
+        android:textSize="14sp" />
+    <View
+        style = "@style/vertical_layout"
+        android:visibility="visible" />
+    <TextView
+        android:id="@+id/listPatPhone"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|center_vertical"
+        android:gravity="center_vertical|center_horizontal"
+        android:textColor="#912CEE"
+        android:textSize="14sp" />
+    <View
+        style = "@style/vertical_layout"
+        android:visibility="visible" />
+    <TextView
+        android:id="@+id/listPatGoWhere"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|center_vertical"
+        android:gravity="center_vertical|center_horizontal"
+        android:textColor="#912CEE"
+        android:textSize="14sp" />
+    <TextView
+        android:id="@+id/listPatGoWhereInt"
+        android:layout_width="1dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|center_vertical"
+        android:gravity="center_vertical|center_horizontal"
+        android:textColor="#912CEE"
+        android:visibility="gone"
+        android:textSize="14sp" />
+    <View
+        style = "@style/vertical_layout"
+        android:visibility="visible" />
+    <TextView
+        android:id="@+id/listPatDoState"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|center_vertical"
+        android:gravity="center_vertical|center_horizontal"
+        android:textColor="#912CEE"
+        android:textSize="14sp" />
+    <View
+        style = "@style/vertical_layout"
+        android:visibility="visible" />
+    <TextView
+        android:id="@+id/listPatAddress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|center_vertical"
+        android:gravity="left|center_vertical"
+        android:textColor="#912CEE"
+        android:textSize="14sp" />
+    <View
+        style = "@style/vertical_layout"
+        android:visibility="visible" />
+</LinearLayout>

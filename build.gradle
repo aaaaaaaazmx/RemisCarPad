@@ -1,0 +1,22 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+buildscript {
+    ext {
+        agp_version = '4.0.0'
+    }
+    repositories {
+        jcenter()
+        google()
+    }
+    dependencies {
+        classpath "com.android.tools.build:gradle:$agp_version"
+    }
+}
+allprojects {
+    repositories {
+        maven{ url'http://maven.aliyun.com/nexus/content/groups/public/' }
+        maven { url 'http://developer.huawei.com/repo/' }
+        jcenter { url 'http://maven.aliyun.com/nexus/content/repositories/jcenter' }
+        jcenter()
+        google()
+    }
+}
