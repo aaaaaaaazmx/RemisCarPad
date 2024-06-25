@@ -14,6 +14,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.icu.text.CaseMap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -27,6 +28,7 @@ import android.telephony.SmsManager;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,6 +50,9 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.drc.remiscar.util.VersionUtil;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -65,6 +70,7 @@ import java.util.List;
 
 public class DetailActivity extends Activity {
 
+    private static final Logger log = LoggerFactory.getLogger(DetailActivity.class);
     TextView labTaskNum = null;
     TextView labPatName = null;
     TextView labPatSex = null;
@@ -166,8 +172,13 @@ public class DetailActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+        extracted();
+    }
 
-        if (CheckPermissionUstils.checkReadPermission(this, new String[]{Manifest.permission.INTERNET, Manifest.permission.CALL_PHONE, Manifest.permission.SEND_SMS, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.CHANGE_WIFI_STATE, Manifest.permission.READ_PHONE_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECEIVE_BOOT_COMPLETED}, CheckPermissionUstils.REQUEST_WRITE_PERMISSION)) {
+    private void extracted() {
+        if (CheckPermissionUstils.checkReadPermission(this,
+                new String[]{Manifest.permission.INTERNET, Manifest.permission.CALL_PHONE, Manifest.permission.SEND_SMS, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.CHANGE_WIFI_STATE, Manifest.permission.READ_PHONE_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECEIVE_BOOT_COMPLETED}
+                , CheckPermissionUstils.REQUEST_WRITE_PERMISSION)) {
             //ReadVersion();
 
             GetControl();
@@ -268,6 +279,17 @@ public class DetailActivity extends Activity {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 } else {
                     Toast.makeText(this, R.string.note_permission_read, Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case CheckPermissionUstils.REQUEST_WRITE_PERMISSION:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // 权限被授予
+                    // Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show();
+                    // 这里你可以继续执行需要权限的操作
+                    extracted();
+                } else {
+                    // 权限被拒绝
+                    Toast.makeText(this, "需要开启相对应的权限", Toast.LENGTH_SHORT).show();
                 }
                 break;
             default:
