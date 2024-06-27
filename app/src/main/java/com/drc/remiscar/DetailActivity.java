@@ -21,6 +21,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.PowerManager;
 import android.provider.Settings;
 import android.telephony.PhoneNumberUtils;
@@ -177,7 +178,7 @@ public class DetailActivity extends Activity {
 
     private void extracted() {
         if (CheckPermissionUstils.checkReadPermission(this,
-                new String[]{Manifest.permission.INTERNET, Manifest.permission.CALL_PHONE, Manifest.permission.SEND_SMS, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.CHANGE_WIFI_STATE, Manifest.permission.READ_PHONE_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECEIVE_BOOT_COMPLETED}
+                new String[]{Manifest.permission.INTERNET, Manifest.permission.CALL_PHONE, Manifest.permission.SEND_SMS, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.CHANGE_WIFI_STATE, Manifest.permission.READ_PHONE_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECEIVE_BOOT_COMPLETED, Manifest.permission.READ_EXTERNAL_STORAGE}
                 , CheckPermissionUstils.REQUEST_WRITE_PERMISSION)) {
             //ReadVersion();
 
@@ -207,6 +208,7 @@ public class DetailActivity extends Activity {
 
             Intent intentService = new Intent(DetailActivity.this, NotificationService.class);
             startService(intentService);
+
             if (Build.VERSION.SDK_INT >= M) {
                 PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
                 boolean hasIgnored = powerManager.isIgnoringBatteryOptimizations(getPackageName());
@@ -731,8 +733,11 @@ public class DetailActivity extends Activity {
 
 
             } catch (IOException e) {
-                alert("网络异常：" + e.getMessage());
-                writeFile("errorIO.log", e.toString());
+                // Use a Handler to post on the main thread
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    alert("网络异常：" + e.getMessage());
+                    writeFile("errorIO.log", e.toString());
+                });
             }
             return result;
         }
@@ -1195,7 +1200,6 @@ public class DetailActivity extends Activity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-
     }
 
     private Runnable postRefreshRunnable = new Runnable() {
