@@ -13,6 +13,7 @@ import android.graphics.Color;
 import android.media.AudioAttributes;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
@@ -42,10 +43,17 @@ public class NotificationService extends Service {
     private Handler handRefresh;
     private TTSManager ttsManager;
     private static final int NOTIFICATION_ID = 123665;
+    private final IBinder binder =  new LocalBinder();
+
+    public class LocalBinder extends Binder {
+        NotificationService getService() {
+            return NotificationService.this;
+        }
+    }
 
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return binder;
     }
 
     @Override
@@ -100,8 +108,6 @@ public class NotificationService extends Service {
                     .setUsage(AudioAttributes.USAGE_NOTIFICATION)
                     .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                     .build();
-
-            // channel.setSound(imageTranslateUri(R.raw.msg), audioAttributes); // 设置通知声音
 
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
@@ -200,7 +206,7 @@ public class NotificationService extends Service {
                             taskNumber = taskNum;
 
                             // TTS播报新任务
-                            ttsManager.speak("您有新的任务: " + task.getString("sceneAddress"));
+                            ttsManager.speak("您有新的任务: " + task.getString("sceneAddress"), 3);
                         } else {
                             Log.d(TAG, "重复任务，忽略通知");
                         }
@@ -215,6 +221,12 @@ public class NotificationService extends Service {
             }
         } catch (Exception e) {
             Log.e(TAG, "Error in getTaskInfoCallback", e);
+        }
+    }
+
+    public void stopTTS() {
+        if (ttsManager != null) {
+            ttsManager.stopTTS();
         }
     }
 }

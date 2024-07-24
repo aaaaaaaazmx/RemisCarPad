@@ -8,10 +8,12 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.icu.text.CaseMap;
@@ -21,6 +23,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Looper;
 import android.os.PowerManager;
 import android.provider.Settings;
@@ -178,6 +181,23 @@ public class DetailActivity extends Activity {
         extracted();
     }
 
+    private NotificationService notificationService;
+    private boolean isBound = false;
+
+    private ServiceConnection serviceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            NotificationService.LocalBinder binder = (NotificationService.LocalBinder) service;
+            notificationService = binder.getService();
+            isBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            isBound = false;
+        }
+    };
+
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void extracted() {
         if (CheckPermissionUstils.checkReadPermission(this,
@@ -211,6 +231,7 @@ public class DetailActivity extends Activity {
 
             Intent intentService = new Intent(DetailActivity.this, NotificationService.class);
             startService(intentService);
+            bindService(intentService, serviceConnection, Context.BIND_AUTO_CREATE);
 
             if (Build.VERSION.SDK_INT >= M) {
                 PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
@@ -247,6 +268,7 @@ public class DetailActivity extends Activity {
         } else {
             intent.setAction("android.settings.APP_NOTIFICATION_SETTINGS");
             intent.putExtra("app_package", getPackageName());
+
             intent.putExtra("app_uid", getApplicationInfo().uid);
         }
         startActivity(intent);
@@ -334,6 +356,7 @@ public class DetailActivity extends Activity {
 
             Intent intentService = new Intent(DetailActivity.this, NotificationService.class);
             startService(intentService);
+            bindService(intentService, serviceConnection, Context.BIND_AUTO_CREATE);
 
             unregisterReceiver(mFinishReceiver);
         }
@@ -821,6 +844,20 @@ public class DetailActivity extends Activity {
                 alert("确认成功");
                 this.btnOkRevice.setEnabled(false);
                 this.btnTaskOver.setEnabled(true);
+                // 当没有收到正确的结果时，停止TTS播放
+                if (isBound && notificationService != null) {
+                    notificationService.stopTTS();
+                }
+            } else {
+                // 当结果为空或为 "null" 时，停止TTS播放
+                if (isBound && notificationService != null) {
+                    notificationService.stopTTS();
+                }
+            }
+        } else {
+            // 当结果为空或为 "null" 时，停止TTS播放
+            if (isBound && notificationService != null) {
+                notificationService.stopTTS();
             }
         }
     }
@@ -1233,5 +1270,9 @@ public class DetailActivity extends Activity {
         super.onDestroy();
         // 当Activity销毁时移除所有回调，防止内存泄露
         handRefresh.removeCallbacks(postRefreshRunnable);
+        if (isBound) {
+            unbindService(serviceConnection);
+            isBound = false;
+        }
     }
 }
