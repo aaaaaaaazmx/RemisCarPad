@@ -4,6 +4,13 @@ buildscript {
         agp_version = '4.0.0'
     }
     repositories {
+        // 使用阿里云的Maven仓库
+        maven {
+            url 'https://maven.aliyun.com/repository/google'
+        }
+        maven {
+            url 'https://maven.aliyun.com/repository/central'
+        }
         jcenter()
         google()
     }

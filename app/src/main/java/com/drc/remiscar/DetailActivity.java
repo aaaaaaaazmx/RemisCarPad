@@ -46,6 +46,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -167,6 +168,7 @@ public class DetailActivity extends Activity {
     private final String _getGEOUrl = "https://www.zhdrs.com:50008/SendGEO?mobile=%s";
     GeoThread _geoThread = null;
     private static final int REQ_PERM_STORAGE = 10001;
+    private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 10002;
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
@@ -176,9 +178,10 @@ public class DetailActivity extends Activity {
         extracted();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void extracted() {
         if (CheckPermissionUstils.checkReadPermission(this,
-                new String[]{Manifest.permission.INTERNET, Manifest.permission.CALL_PHONE, Manifest.permission.SEND_SMS, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.CHANGE_WIFI_STATE, Manifest.permission.READ_PHONE_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECEIVE_BOOT_COMPLETED, Manifest.permission.READ_EXTERNAL_STORAGE}
+                new String[]{Manifest.permission.INTERNET, Manifest.permission.CALL_PHONE, Manifest.permission.SEND_SMS, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.CHANGE_WIFI_STATE, Manifest.permission.READ_PHONE_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECEIVE_BOOT_COMPLETED}
                 , CheckPermissionUstils.REQUEST_WRITE_PERMISSION)) {
             //ReadVersion();
 
@@ -273,6 +276,7 @@ public class DetailActivity extends Activity {
         return true;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -282,6 +286,10 @@ public class DetailActivity extends Activity {
                 } else {
                     Toast.makeText(this, R.string.note_permission_read, Toast.LENGTH_SHORT).show();
                 }
+                break;
+            case MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE:
+                String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/remis/remis.log";
+                txtLog.setText(readFileLog(path));
                 break;
             case CheckPermissionUstils.REQUEST_WRITE_PERMISSION:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -483,8 +491,12 @@ public class DetailActivity extends Activity {
 
     @TargetApi(Build.VERSION_CODES.FROYO)
     private void readLog() {
-        String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/remis/remis.log";
-        txtLog.setText(readFileLog(path));
+        // Check if permission is not granted
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            // Should we show an explanation?
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+        }
+
     }
 
     private void InitControl() {
@@ -1102,7 +1114,10 @@ public class DetailActivity extends Activity {
         builder.create().show();
     }
 
+
     private String readFileLog(final String fileName) {
+        // Permission has already been granted
+        // You can read the file
         String content = "";
         BufferedReader r = null;
         try {
