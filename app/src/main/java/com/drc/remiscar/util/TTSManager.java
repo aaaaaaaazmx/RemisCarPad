@@ -1,12 +1,11 @@
 package com.drc.remiscar.util;
 
-
 import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
 import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.util.ArrayDeque;
 import java.util.Locale;
@@ -18,6 +17,8 @@ public class TTSManager implements TextToSpeech.OnInitListener {
     private Context context;
     private Handler handler;
     private Queue<String> messageQueue = new ArrayDeque<>();
+    private int repeatCount = 0;
+    private int currentRepeat = 0;
 
     public TTSManager(Context context) {
         this.context = context;
@@ -28,6 +29,25 @@ public class TTSManager implements TextToSpeech.OnInitListener {
     private void initializeTTS() {
         if (tts == null) {
             tts = new TextToSpeech(context, this);
+            tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+                @Override
+                public void onStart(String utteranceId) {
+                    // Do nothing
+                }
+
+                @Override
+                public void onDone(String utteranceId) {
+                    currentRepeat++;
+                    if (currentRepeat < repeatCount) {
+                        speakNext();
+                    }
+                }
+
+                @Override
+                public void onError(String utteranceId) {
+                    // Do nothing
+                }
+            });
         }
     }
 
@@ -47,24 +67,32 @@ public class TTSManager implements TextToSpeech.OnInitListener {
         }
     }
 
-    public void speak(String text) {
+    public void speak(String text, int repeat) {
+        this.repeatCount = repeat;
+        this.currentRepeat = 0;
+        messageQueue.offer(text);  // Queue the message for later playback
         if (isInitialized && tts != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, null);
-            }
+            speakNext();
         } else {
             Log.e("TTSManager", "TTS not initialized, queuing message");
-            messageQueue.offer(text);  // Queue the message for later playback
             if (!isInitialized || null == tts) {
                 retryInitialization();  // Retry initializing if failed
             }
         }
     }
 
+    private void speakNext() {
+        if (isInitialized && tts != null && !messageQueue.isEmpty()) {
+            String text = messageQueue.peek();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "UniqueID");
+            }
+        }
+    }
+
     private void flushMessageQueue() {
-        while (!messageQueue.isEmpty()) {
-            String message = messageQueue.poll();
-            speak(message);
+        if (!messageQueue.isEmpty()) {
+            speakNext();
         }
     }
 
@@ -73,6 +101,12 @@ public class TTSManager implements TextToSpeech.OnInitListener {
             tts.stop();
             tts.shutdown();
             tts = null;
+        }
+    }
+
+    public void stopTTS() {
+        if (tts != null) {
+            tts.stop();
         }
     }
 

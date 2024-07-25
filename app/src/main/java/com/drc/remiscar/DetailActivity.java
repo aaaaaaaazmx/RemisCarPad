@@ -8,10 +8,12 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.icu.text.CaseMap;
@@ -21,6 +23,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Looper;
 import android.os.PowerManager;
 import android.provider.Settings;
@@ -46,6 +49,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -167,6 +171,7 @@ public class DetailActivity extends Activity {
     private final String _getGEOUrl = "https://www.zhdrs.com:50008/SendGEO?mobile=%s";
     GeoThread _geoThread = null;
     private static final int REQ_PERM_STORAGE = 10001;
+    private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 10002;
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
@@ -176,9 +181,27 @@ public class DetailActivity extends Activity {
         extracted();
     }
 
+    private NotificationService notificationService;
+    private boolean isBound = false;
+
+    private ServiceConnection serviceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            NotificationService.LocalBinder binder = (NotificationService.LocalBinder) service;
+            notificationService = binder.getService();
+            isBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            isBound = false;
+        }
+    };
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void extracted() {
         if (CheckPermissionUstils.checkReadPermission(this,
-                new String[]{Manifest.permission.INTERNET, Manifest.permission.CALL_PHONE, Manifest.permission.SEND_SMS, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.CHANGE_WIFI_STATE, Manifest.permission.READ_PHONE_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECEIVE_BOOT_COMPLETED, Manifest.permission.READ_EXTERNAL_STORAGE}
+                new String[]{Manifest.permission.INTERNET, Manifest.permission.CALL_PHONE, Manifest.permission.SEND_SMS, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.CHANGE_WIFI_STATE, Manifest.permission.READ_PHONE_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECEIVE_BOOT_COMPLETED}
                 , CheckPermissionUstils.REQUEST_WRITE_PERMISSION)) {
             //ReadVersion();
 
@@ -208,6 +231,7 @@ public class DetailActivity extends Activity {
 
             Intent intentService = new Intent(DetailActivity.this, NotificationService.class);
             startService(intentService);
+            bindService(intentService, serviceConnection, Context.BIND_AUTO_CREATE);
 
             if (Build.VERSION.SDK_INT >= M) {
                 PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
@@ -244,6 +268,7 @@ public class DetailActivity extends Activity {
         } else {
             intent.setAction("android.settings.APP_NOTIFICATION_SETTINGS");
             intent.putExtra("app_package", getPackageName());
+
             intent.putExtra("app_uid", getApplicationInfo().uid);
         }
         startActivity(intent);
@@ -273,6 +298,7 @@ public class DetailActivity extends Activity {
         return true;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -282,6 +308,10 @@ public class DetailActivity extends Activity {
                 } else {
                     Toast.makeText(this, R.string.note_permission_read, Toast.LENGTH_SHORT).show();
                 }
+                break;
+            case MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE:
+                String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/remis/remis.log";
+                txtLog.setText(readFileLog(path));
                 break;
             case CheckPermissionUstils.REQUEST_WRITE_PERMISSION:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -326,6 +356,7 @@ public class DetailActivity extends Activity {
 
             Intent intentService = new Intent(DetailActivity.this, NotificationService.class);
             startService(intentService);
+            bindService(intentService, serviceConnection, Context.BIND_AUTO_CREATE);
 
             unregisterReceiver(mFinishReceiver);
         }
@@ -483,8 +514,12 @@ public class DetailActivity extends Activity {
 
     @TargetApi(Build.VERSION_CODES.FROYO)
     private void readLog() {
-        String path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/remis/remis.log";
-        txtLog.setText(readFileLog(path));
+        // Check if permission is not granted
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            // Should we show an explanation?
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+        }
+
     }
 
     private void InitControl() {
@@ -809,6 +844,20 @@ public class DetailActivity extends Activity {
                 alert("确认成功");
                 this.btnOkRevice.setEnabled(false);
                 this.btnTaskOver.setEnabled(true);
+                // 当没有收到正确的结果时，停止TTS播放
+                if (isBound && notificationService != null) {
+                    notificationService.stopTTS();
+                }
+            } else {
+                // 当结果为空或为 "null" 时，停止TTS播放
+                if (isBound && notificationService != null) {
+                    notificationService.stopTTS();
+                }
+            }
+        } else {
+            // 当结果为空或为 "null" 时，停止TTS播放
+            if (isBound && notificationService != null) {
+                notificationService.stopTTS();
             }
         }
     }
@@ -1102,7 +1151,10 @@ public class DetailActivity extends Activity {
         builder.create().show();
     }
 
+
     private String readFileLog(final String fileName) {
+        // Permission has already been granted
+        // You can read the file
         String content = "";
         BufferedReader r = null;
         try {
@@ -1218,5 +1270,9 @@ public class DetailActivity extends Activity {
         super.onDestroy();
         // 当Activity销毁时移除所有回调，防止内存泄露
         handRefresh.removeCallbacks(postRefreshRunnable);
+        if (isBound) {
+            unbindService(serviceConnection);
+            isBound = false;
+        }
     }
 }
