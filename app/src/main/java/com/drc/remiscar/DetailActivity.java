@@ -483,7 +483,7 @@ public class DetailActivity extends Activity {
         txtLog.isScrollbarFadingEnabled();
         txtLog.setEnabled(false);
         dialogLog = new AlertDialog.Builder(this).setTitle("查看日志").setView(txtLog).setPositiveButton("确定", null).create();
-        dialogSet = new AlertDialog.Builder(this).setTitle("系统设置").setItems(new String[]{"服务地址", "服务端口", "设备ID号", "关于", "查看日志"}, new DialogInterface.OnClickListener() {
+        dialogSet = new AlertDialog.Builder(this).setTitle("系统设置").setItems(new String[]{"服务地址", "服务端口", "设备ID号", "关于", "查看日志", "一键呼救"}, new DialogInterface.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -506,6 +506,12 @@ public class DetailActivity extends Activity {
                     case 4:
                         readLog();
                         dialogLog.show();
+                        break;
+                    case 5:
+                        // 一键呼救 ，跳转通讯录拨打120
+                        Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:120"));
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
                         break;
                 }
             }
