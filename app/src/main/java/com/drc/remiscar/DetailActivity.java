@@ -1,6 +1,7 @@
 package com.drc.remiscar;
 
 import static android.os.Build.VERSION_CODES.M;
+import static android.os.Build.VERSION_CODES.P;
 
 import android.Manifest;
 import android.annotation.TargetApi;
@@ -53,6 +54,8 @@ import androidx.core.content.ContextCompat;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.amap.api.location.AMapLocationClient;
+import com.amap.api.maps.MapView;
 import com.drc.remiscar.util.VersionUtil;
 
 import org.slf4j.Logger;
@@ -198,6 +201,35 @@ public class DetailActivity extends Activity {
         }
     };
 
+    private static final int REQUEST_PERMISSIONSS = 1111;
+    private static final String[] PERMISSIONS = {
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.ACCESS_BACKGROUND_LOCATION
+    };
+
+    private void permiss() {
+        AMapLocationClient.updatePrivacyShow(getApplicationContext(),true,true);
+        AMapLocationClient.updatePrivacyAgree(getApplicationContext(),true);
+        // 检查定位权限
+        // 检查以下这些权限
+        if (!hasPermissions()) {
+            ActivityCompat.requestPermissions(this, PERMISSIONS, REQUEST_PERMISSIONSS);
+        } else {
+            startActivity(new Intent(DetailActivity.this, MapActivity.class));
+        }
+    }
+
+    private boolean hasPermissions() {
+        for (String permission : PERMISSIONS) {
+            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void extracted() {
         if (CheckPermissionUstils.checkReadPermission(this,
@@ -323,6 +355,10 @@ public class DetailActivity extends Activity {
                     // 权限被拒绝
                     Toast.makeText(this, "需要开启相对应的权限", Toast.LENGTH_SHORT).show();
                 }
+                break;
+
+            case REQUEST_PERMISSIONSS:
+                startActivity(new Intent(DetailActivity.this, MapActivity.class));
                 break;
             default:
                 break;
@@ -483,7 +519,7 @@ public class DetailActivity extends Activity {
         txtLog.isScrollbarFadingEnabled();
         txtLog.setEnabled(false);
         dialogLog = new AlertDialog.Builder(this).setTitle("查看日志").setView(txtLog).setPositiveButton("确定", null).create();
-        dialogSet = new AlertDialog.Builder(this).setTitle("系统设置").setItems(new String[]{"服务地址", "服务端口", "设备ID号", "关于", "查看日志", "一键呼救"}, new DialogInterface.OnClickListener() {
+        dialogSet = new AlertDialog.Builder(this).setTitle("系统设置").setItems(new String[]{"服务地址", "服务端口", "设备ID号", "关于", "查看日志", "一键呼救", "AED地图", "心肺复苏/AED 操作视频", "急救新闻、事件报道宣传"}, new DialogInterface.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -512,6 +548,27 @@ public class DetailActivity extends Activity {
                         Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:120"));
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
+                        break;
+                    case 6:
+                        // AED地图 + 一键取物
+                        // 高德地图
+                        permiss();
+                        break;
+
+                    case 7:
+                        // 心肺复苏/AED 操作视频
+                        // 调用手机播放器查看网络视频方法
+                        Uri videoUri = Uri.parse("VIDEO_URL");
+                        Intent intent2 = new Intent(Intent.ACTION_VIEW, videoUri);
+                        intent2.setDataAndType(videoUri, "video/*");
+                        startActivity(intent2);
+                        break;
+
+                    case 8:
+                        // 急救新闻、事件报道宣传 跳转跳转手机系统的网页
+                        Uri uri = Uri.parse("http://www.baidu.com");
+                        Intent intent1 = new Intent(Intent.ACTION_VIEW, uri);
+                        startActivity(intent1);
                         break;
                 }
             }

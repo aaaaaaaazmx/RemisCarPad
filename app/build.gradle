@@ -16,6 +16,11 @@ android {
         javaCompileOptions { annotationProcessorOptions { includeCompileClasspath = true } }
         versionCode 14
         versionName "1.2.5"
+
+        ndk {
+            //设置支持的SO库架构（开发者可以根据需要，选择一个或多个平台的so）
+            abiFilters "armeabi", "armeabi-v7a", "arm64-v8a", "x86","x86_64"
+        }
     }
 
     lintOptions {
@@ -46,9 +51,28 @@ android {
             signingConfig signingConfigs.release
         }
     }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+        }
+
+        // Move the tests to tests/java, tests/res, etc...
+//        instrumentTest.setRoot('tests')
+
+        // Move the build types to build-types/<type>
+        // For instance, build-types/debug/java, build-types/debug/AndroidManifest.xml, ...
+        // This moves them out of them default location under src/<type>/... which would
+        // conflict with src/ being used by the main source set.
+        // Adding new build types or product flavors should be accompanied
+        // by a similar customization.
+        debug.setRoot('build-types/debug')
+        release.setRoot('build-types/release')
+    }
 }
 
 dependencies {
+    implementation fileTree(include: '*.jar', dir: 'libs')
     implementation 'com.squareup.okhttp3:parent:3.12.1'
     implementation 'com.squareup.okhttp3:okhttp-android-support:3.12.1'
     implementation 'org.projectlombok:lombok:1.18.22'
