@@ -558,10 +558,16 @@ public class DetailActivity extends Activity {
                     case 7:
                         // 心肺复苏/AED 操作视频
                         // 调用手机播放器查看网络视频方法
-                        Uri videoUri = Uri.parse("VIDEO_URL");
-                        Intent intent2 = new Intent(Intent.ACTION_VIEW, videoUri);
-                        intent2.setDataAndType(videoUri, "video/*");
-                        startActivity(intent2);
+                        //Uri videoUri = Uri.parse("https://www.youtube.com/watch?v=f4cKo1jFZG0");
+                        Uri videoUri = Uri.parse("https://res.exexm.com/cw_145225549855002");
+                        // Uri videoUri = Uri.parse("https://www.bilibili.com/video/BV1SW421R7EZ/?spm_id_from=333.1007.tianma.1-2-2.click");
+                        Intent intent12 = new Intent(Intent.ACTION_VIEW, videoUri);
+                        intent12.putExtra("force_fullscreen", true); // 可选：强制全屏播放
+                        if (intent12.resolveActivity(getPackageManager()) != null) {
+                            startActivity(intent12);
+                        } else {
+                            Toast.makeText(DetailActivity.this, "没有可用的应用来播放视频", Toast.LENGTH_LONG).show();
+                        }
                         break;
 
                     case 8:
