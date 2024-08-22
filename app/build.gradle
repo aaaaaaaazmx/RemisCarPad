@@ -1,19 +1,29 @@
-apply plugin: 'com.android.application'
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+}
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 33
     buildToolsVersion "29.0.3"
 
     defaultConfig {
         applicationId "com.drc.remiscar"
         minSdkVersion 16
         //noinspection ExpiredTargetSdkVersion
-        targetSdkVersion 29
+        targetSdkVersion 33
         compileOptions {
-            sourceCompatibility JavaVersion.VERSION_1_8
-            targetCompatibility JavaVersion.VERSION_1_8
+            sourceCompatibility JavaVersion.VERSION_11
+            targetCompatibility JavaVersion.VERSION_11
         }
-        javaCompileOptions { annotationProcessorOptions { includeCompileClasspath = true } }
+        kotlinOptions {
+            jvmTarget = "11"
+        }
+        javaCompileOptions {
+            annotationProcessorOptions {
+                // Add any specific arguments or annotation processors here if needed
+            }
+        }
         versionCode 15
         versionName "1.2.6"
 
@@ -87,4 +97,7 @@ dependencies {
     implementation 'org.projectlombok:lombok'
     annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.3'
     annotationProcessor 'org.projectlombok:lombok:1.18.10'
+    implementation 'com.google.android.exoplayer:exoplayer:2.18.1'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation "androidx.core:core-ktx:1.10.1"
 }

@@ -57,6 +57,12 @@ import com.alibaba.fastjson.JSONObject;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.maps.MapView;
 import com.drc.remiscar.util.VersionUtil;
+import com.drc.remiscar.widget.AvatarFloatView;
+import com.drc.remiscar.widget.BaseFloatView;
+import com.drc.remiscar.widget.FloatManager;
+import com.google.android.exoplayer2.MediaItem;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.ui.PlayerView;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,6 +100,8 @@ public class DetailActivity extends Activity {
     Button btnPos = null;
     Button btnSet = null;
     Button btnRefresh = null;
+    Button btnMap = null;
+    Button btnAed = null;
     Button btnCall1 = null;
     Button btnCall2 = null;
     Button btnGEO1 = null;
@@ -175,6 +183,7 @@ public class DetailActivity extends Activity {
     GeoThread _geoThread = null;
     private static final int REQ_PERM_STORAGE = 10001;
     private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 10002;
+    private AvatarFloatView mFloatView;
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
@@ -182,6 +191,30 @@ public class DetailActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
         extracted();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        initView();
+    }
+
+    private void initView() {
+        // 初始化悬浮按钮
+        mFloatView = new AvatarFloatView(this);
+        mFloatView.setDragDistance(0.3);
+        mFloatView.setAdsorbType(BaseFloatView.ADSORB_HORIZONTAL);
+        // mFloatView.setAdsorbType(BaseFloatView.ADSORB_VERTICAL);
+        FloatManager.with(this).add(mFloatView)
+                .setClick(new BaseFloatView.OnFloatClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:120"));
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    }
+                })
+                .show();
     }
 
     private NotificationService notificationService;
@@ -205,7 +238,7 @@ public class DetailActivity extends Activity {
     private static final String[] PERMISSIONS = {
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R ? Manifest.permission.READ_PHONE_STATE : Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.ACCESS_BACKGROUND_LOCATION
     };
 
@@ -233,9 +266,16 @@ public class DetailActivity extends Activity {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void extracted() {
         if (CheckPermissionUstils.checkReadPermission(this,
-                new String[]{Manifest.permission.INTERNET, Manifest.permission.CALL_PHONE, Manifest.permission.SEND_SMS, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.CHANGE_WIFI_STATE, Manifest.permission.READ_PHONE_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECEIVE_BOOT_COMPLETED}
+                new String[]{Manifest.permission.INTERNET, Manifest.permission.CALL_PHONE, Manifest.permission.SEND_SMS, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.CHANGE_WIFI_STATE, Manifest.permission.READ_PHONE_STATE, Build.VERSION.SDK_INT >= Build.VERSION_CODES.R ? Manifest.permission.READ_PHONE_STATE : Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECEIVE_BOOT_COMPLETED}
                 , CheckPermissionUstils.REQUEST_WRITE_PERMISSION)) {
             //ReadVersion();
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                if (!Environment.isExternalStorageManager()) {
+                    Intent intent = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+                    startActivity(intent);
+                }
+            }
 
             GetControl();
             InitControl();
@@ -320,11 +360,11 @@ public class DetailActivity extends Activity {
     }
 
     private boolean checkReadPermission() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+        if (ActivityCompat.checkSelfPermission(this, Build.VERSION.SDK_INT >= Build.VERSION_CODES.R ? Manifest.permission.READ_PHONE_STATE : Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Build.VERSION.SDK_INT >= Build.VERSION_CODES.R ? Manifest.permission.READ_PHONE_STATE : Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                 Toast.makeText(this, R.string.note_permission_read, Toast.LENGTH_SHORT).show();
             }
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQ_PERM_STORAGE);
+            ActivityCompat.requestPermissions(this, new String[]{Build.VERSION.SDK_INT >= Build.VERSION_CODES.R ? Manifest.permission.READ_PHONE_STATE : Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQ_PERM_STORAGE);
             return false;
         }
         return true;
@@ -519,7 +559,7 @@ public class DetailActivity extends Activity {
         txtLog.isScrollbarFadingEnabled();
         txtLog.setEnabled(false);
         dialogLog = new AlertDialog.Builder(this).setTitle("查看日志").setView(txtLog).setPositiveButton("确定", null).create();
-        dialogSet = new AlertDialog.Builder(this).setTitle("系统设置").setItems(new String[]{"服务地址", "服务端口", "设备ID号", "关于", "查看日志", "一键呼救", "AED地图", "心肺复苏/AED 操作视频", "急救新闻、事件报道宣传"}, new DialogInterface.OnClickListener() {
+        dialogSet = new AlertDialog.Builder(this).setTitle("系统设置").setItems(new String[]{"服务地址", "服务端口", "设备ID号", "关于", "查看日志"}, new DialogInterface.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -542,39 +582,6 @@ public class DetailActivity extends Activity {
                     case 4:
                         readLog();
                         dialogLog.show();
-                        break;
-                    case 5:
-                        // 一键呼救 ，跳转通讯录拨打120
-                        Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:120"));
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(intent);
-                        break;
-                    case 6:
-                        // AED地图 + 一键取物
-                        // 高德地图
-                        permiss();
-                        break;
-
-                    case 7:
-                        // 心肺复苏/AED 操作视频
-                        // 调用手机播放器查看网络视频方法
-                        //Uri videoUri = Uri.parse("https://www.youtube.com/watch?v=f4cKo1jFZG0");
-                        Uri videoUri = Uri.parse("https://res.exexm.com/cw_145225549855002");
-                        // Uri videoUri = Uri.parse("https://www.bilibili.com/video/BV1SW421R7EZ/?spm_id_from=333.1007.tianma.1-2-2.click");
-                        Intent intent12 = new Intent(Intent.ACTION_VIEW, videoUri);
-                        intent12.putExtra("force_fullscreen", true); // 可选：强制全屏播放
-                        if (intent12.resolveActivity(getPackageManager()) != null) {
-                            startActivity(intent12);
-                        } else {
-                            Toast.makeText(DetailActivity.this, "没有可用的应用来播放视频", Toast.LENGTH_LONG).show();
-                        }
-                        break;
-
-                    case 8:
-                        // 急救新闻、事件报道宣传 跳转跳转手机系统的网页
-                        Uri uri = Uri.parse("http://www.baidu.com");
-                        Intent intent1 = new Intent(Intent.ACTION_VIEW, uri);
-                        startActivity(intent1);
                         break;
                 }
             }
@@ -602,6 +609,34 @@ public class DetailActivity extends Activity {
             }
 
         });
+
+        btnMap.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                permiss();
+            }
+        });
+
+        btnAed.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // 内嵌播放视频
+                SimpleExoPlayer player = new SimpleExoPlayer.Builder(DetailActivity.this).build();
+                PlayerView playerView = findViewById(R.id.player_view);
+                playerView.setVisibility(View.VISIBLE);
+                playerView.setPlayer(player);
+
+                // 本地视频
+                                //Uri uri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.your_video);
+                // 或网络视频
+                Uri uri = Uri.parse("https://res.exexm.com/cw_145225549855002");
+                MediaItem mediaItem = MediaItem.fromUri(uri);
+                player.setMediaItem(mediaItem);
+                player.prepare();
+                player.play();
+            }
+        });
+
         btnSet.setOnClickListener(new OnClickListener() {
 
             @Override
@@ -799,6 +834,8 @@ public class DetailActivity extends Activity {
         labyscd = findViewById(R.id.labyscd);
         btnPos = findViewById(R.id.btnPos);
         btnRefresh = findViewById(R.id.btnRefresh);
+        btnMap = findViewById(R.id.btnMap);
+        btnAed = findViewById(R.id.btnAed);
         btnSet = findViewById(R.id.btnSet);
         btnCall1 = findViewById(R.id.btnCall1);
         btnCall2 = findViewById(R.id.btnCall2);

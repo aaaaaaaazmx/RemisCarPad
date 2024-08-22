@@ -1,7 +1,8 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     ext {
-        agp_version = '4.0.0'
+        agp_version = '8.1.0'
+        kotlin_version = '1.8.21'  // Use the latest stable version
     }
     repositories {
         // 使用阿里云的Maven仓库
@@ -15,14 +16,15 @@ buildscript {
         google()
     }
     dependencies {
-        classpath "com.android.tools.build:gradle:$agp_version"
+        classpath("com.android.tools.build:gradle:7.4.2")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.20")
     }
 }
 allprojects {
     repositories {
-        maven{ url'http://maven.aliyun.com/nexus/content/groups/public/' }
-        maven { url 'http://developer.huawei.com/repo/' }
-        jcenter { url 'http://maven.aliyun.com/nexus/content/repositories/jcenter' }
+        maven{ url'https://maven.aliyun.com/nexus/content/groups/public/' }
+        maven { url 'https://developer.huawei.com/repo/' }
+        jcenter { url 'https://maven.aliyun.com/nexus/content/repositories/jcenter' }
         jcenter()
         google()
     }
