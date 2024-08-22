@@ -55,6 +55,7 @@
 
 
     <application
+        android:name=".MyApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/AppName"
@@ -109,6 +110,10 @@
         <activity android:name=".MapActivity"
             android:screenOrientation="portrait"
             />
+        <activity android:name=".ExoPlayerActivity" />
+        <activity android:name=".util.WebActivity" />
+        <activity android:name=".util.BaseWebActivity" />
+        <activity android:name=".NewsActivity" />
     </application>
 
 </manifest>

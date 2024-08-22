@@ -621,19 +621,7 @@ public class DetailActivity extends Activity {
             @Override
             public void onClick(View view) {
                 // 内嵌播放视频
-                SimpleExoPlayer player = new SimpleExoPlayer.Builder(DetailActivity.this).build();
-                PlayerView playerView = findViewById(R.id.player_view);
-                playerView.setVisibility(View.VISIBLE);
-                playerView.setPlayer(player);
-
-                // 本地视频
-                                //Uri uri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.your_video);
-                // 或网络视频
-                Uri uri = Uri.parse("https://res.exexm.com/cw_145225549855002");
-                MediaItem mediaItem = MediaItem.fromUri(uri);
-                player.setMediaItem(mediaItem);
-                player.prepare();
-                player.play();
+                startActivity(new Intent(DetailActivity.this, NewsActivity.class));
             }
         });
 

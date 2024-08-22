@@ -50,7 +50,7 @@ public class AvatarFloatView extends BaseFloatView {
 
     @Override
     public long getAdsorbTime() {
-        return 3000;
+        return 1000;
     }
 
     public void setAdsorbType(int type) {
