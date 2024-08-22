@@ -1,27 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="fill_parent"
         android:layout_height="70dp"
         android:orientation="horizontal">
 
         <Button
+            app:layout_constraintEnd_toStartOf="@+id/btnMap"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             android:id="@+id/btnRefresh"
-            android:layout_width="180dp"
-            android:layout_height="50dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_gravity="left|center_vertical|clip_vertical"
-            android:layout_weight="1"
-            android:background="@mipmap/refresh_bg"
+            android:background="@mipmap/refresh"
             android:gravity="center_vertical|center_horizontal"
             android:textColor="#ff0000" />
 
-        <TextView
+       <!-- <TextView
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_gravity="left|center_vertical|clip_vertical"
@@ -29,18 +32,50 @@
             android:gravity="center_vertical|center_horizontal"
             android:text="任务信息"
             android:textColor="#EE7600"
-            android:textSize="35sp" />
+            android:textSize="35sp" />-->
 
         <Button
+            app:layout_constraintEnd_toStartOf="@+id/btnAed"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/btnRefresh"
+            android:layout_gravity="center_vertical|clip_vertical"
+            android:id="@+id/btnMap"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:background="@mipmap/map"
+            android:gravity="center_vertical|center_horizontal"
+            android:textColor="#ff0000" />
+
+        <Button
+            app:layout_constraintEnd_toStartOf="@+id/btnSet"
+            app:layout_constraintStart_toEndOf="@+id/btnMap"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_gravity="center_vertical|clip_vertical"
+            android:id="@+id/btnAed"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:background="@mipmap/news"
+            android:gravity="center_vertical|center_horizontal"
+            android:textColor="#ff0000" />
+
+        <Button
+            app:layout_constraintStart_toEndOf="@+id/btnAed"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             android:id="@+id/btnSet"
-            android:layout_width="180dp"
+            android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_gravity="right|center_vertical|clip_vertical"
             android:layout_weight="1"
-            android:background="@mipmap/set_bg"
+            android:background="@mipmap/setting"
             android:gravity="center_vertical|center_horizontal"
             android:textColor="#ff0000" />
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ScrollView
         android:layout_width="fill_parent"

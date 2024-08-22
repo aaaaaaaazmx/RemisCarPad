@@ -78,7 +78,11 @@ public class NotificationService extends Service {
 
         messageNotificatioManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         messageIntent = new Intent(this, DetailActivity.class);
-        messagePendingIntent = PendingIntent.getActivity(this, 0, messageIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            messagePendingIntent = PendingIntent.getActivity(this, 0, messageIntent, PendingIntent.FLAG_IMMUTABLE);
+        } else {
+            messagePendingIntent = PendingIntent.getActivity(this, 0, messageIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        }
 
         MessageThread messageThread = new MessageThread();
         messageThread.start();
@@ -116,7 +120,12 @@ public class NotificationService extends Service {
 
     private Notification buildForegroundNotification() {
         Intent notificationIntent = new Intent(this, DetailActivity.class); // 点击通知时打开的Activity
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
+        } else {
+            pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        }
 
         return new NotificationCompat.Builder(this, "foreground_service_channel")
                 .setContentTitle("Service Running")
@@ -206,7 +215,7 @@ public class NotificationService extends Service {
                             taskNumber = taskNum;
 
                             // TTS播报新任务
-                            ttsManager.speak("您有新的任务: " + task.getString("sceneAddress"), 3);
+                            ttsManager.speak("您有新的任务", 3);
                         } else {
                             Log.d(TAG, "重复任务，忽略通知");
                         }
