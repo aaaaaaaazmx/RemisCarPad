@@ -62,6 +62,7 @@ import com.drc.remiscar.widget.BaseFloatView;
 import com.drc.remiscar.widget.FloatManager;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.extractor.FlacSeekTableSeekMap;
 import com.google.android.exoplayer2.ui.PlayerView;
 
 import org.slf4j.Logger;
@@ -190,16 +191,12 @@ public class DetailActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+        initView();
         extracted();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        initView();
-    }
-
     private void initView() {
+        FloatManager.hide();
         // 初始化悬浮按钮
         mFloatView = new AvatarFloatView(this);
         mFloatView.setDragDistance(0.3);
