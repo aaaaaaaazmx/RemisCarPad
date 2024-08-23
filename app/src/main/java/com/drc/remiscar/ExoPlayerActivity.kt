@@ -19,14 +19,24 @@ class ExoPlayerActivity : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_exo)
 
+        val url = intent.getStringExtra("VIDEO_URL")
+
         player = SimpleExoPlayer.Builder(this).build()
         val playerView = findViewById<PlayerView>(R.id.player_view)
         playerView.player = player
 
-
-// 本地视频
-        val uri = Uri.parse("android.resource://" + packageName + "/" + R.raw.aed)
-
+        // 本地视频
+        val uri = when(url) {
+            "aed" -> {
+                Uri.parse("android.resource://" + packageName + "/" + R.raw.aed)
+            }
+            "xffs" -> {
+                Uri.parse("android.resource://" + packageName + "/" + R.raw.xffs)
+            }
+            else -> {
+                Uri.parse("android.resource://" + packageName + "/" + R.raw.aed)
+            }
+        }
 
         // 或网络视频
         val mediaItem = MediaItem.fromUri(uri)
