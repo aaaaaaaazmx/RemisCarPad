@@ -17,7 +17,9 @@ class NewsActivity : Activity() {
        findViewById<TextView>(R.id.tv_one).apply {
            paintFlags = paintFlags or Paint.UNDERLINE_TEXT_FLAG
        }.setOnClickListener {
-           startActivity(Intent(this@NewsActivity, ExoPlayerActivity::class.java))
+           startActivity(Intent(this@NewsActivity, ExoPlayerActivity::class.java).apply {
+               putExtra("VIDEO_URL", "aed")
+           })
        }
 
         findViewById<TextView>(R.id.tv_two).apply {
@@ -42,6 +44,14 @@ class NewsActivity : Activity() {
             val intent = Intent(this, WebActivity::class.java)
             intent.putExtra(WebActivity.KEY_WEB_URL, "http://www.hnredcross.gov.cn/nograb/646849/55/13889751.html")
             startActivity(intent)
+        }
+
+        findViewById<TextView>(R.id.tv_five).apply {
+            paintFlags = paintFlags or Paint.UNDERLINE_TEXT_FLAG
+        }.setOnClickListener {
+            startActivity(Intent(this@NewsActivity, ExoPlayerActivity::class.java).apply {
+                putExtra("VIDEO_URL", "xffs")
+            })
         }
     }
 
