@@ -124,7 +124,7 @@ public class MapActivity extends Activity implements PoiSearch.OnPoiSearchListen
     }
 
     private void fetchPOIs() {
-        String[] keywordsArray = {"医院", "卫健委", "急救中心", "120指挥中心"};
+        String[] keywordsArray = {"医院", "卫健委", "急救中心", "120指挥中心", "AED"};
         for (String keyword : keywordsArray) {
             PoiSearch.Query query = new PoiSearch.Query(keyword, "", currentCity);
             query.setPageSize(50); // 设置每页最多返回多少条poiitem
