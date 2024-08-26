@@ -79,7 +79,7 @@ public class NotificationService extends Service {
         messageNotificatioManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         messageIntent = new Intent(this, DetailActivity.class);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            messagePendingIntent = PendingIntent.getActivity(this, 0, messageIntent, PendingIntent.FLAG_IMMUTABLE);
+            messagePendingIntent = PendingIntent.getActivity(this, 0, messageIntent, PendingIntent.FLAG_MUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
         } else {
             messagePendingIntent = PendingIntent.getActivity(this, 0, messageIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         }
@@ -122,7 +122,7 @@ public class NotificationService extends Service {
         Intent notificationIntent = new Intent(this, DetailActivity.class); // 点击通知时打开的Activity
         PendingIntent pendingIntent;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
+            pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_MUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
         } else {
             pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         }

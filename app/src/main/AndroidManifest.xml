@@ -67,7 +67,7 @@
 
         <meta-data
             android:name="com.amap.api.v2.apikey"
-            android:value="934fd14c8689e554a44ca18dded57407" />
+            android:value="6c1c27b30e04dc0b8d2c1a3b05d02f5f" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
