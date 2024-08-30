@@ -17,6 +17,8 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.PowerManager;
+import android.speech.tts.UtteranceProgressListener;
 import android.util.Log;
 
 import androidx.annotation.RequiresApi;
@@ -30,12 +32,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Date;
 
 public class NotificationService extends Service {
     private static final Logger log = LoggerFactory.getLogger(NotificationService.class);
     private static final String TAG = "NotificationService";
-    private NotificationManager messageNotificatioManager;
+    private NotificationManager messageNotificationManager;
     private String taskNumber = "";
     private NotificationCompat.Builder builder1;
     private Intent messageIntent;
@@ -43,7 +44,8 @@ public class NotificationService extends Service {
     private Handler handRefresh;
     private TTSManager ttsManager;
     private static final int NOTIFICATION_ID = 123665;
-    private final IBinder binder =  new LocalBinder();
+    private final IBinder binder = new LocalBinder();
+    private PowerManager.WakeLock wakeLock;
 
     public class LocalBinder extends Binder {
         NotificationService getService() {
@@ -61,12 +63,16 @@ public class NotificationService extends Service {
         super.onCreate();
         Log.i(TAG, "onCreate");
 
+        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "NotificationService::WakeLock");
+
         ttsManager = new TTSManager(this);
+        ttsManager.setAudioAttributes(AudioAttributes.USAGE_ALARM);
 
         createNotificationChannel();
 
         Notification notification = buildForegroundNotification();
-        startForeground(NOTIFICATION_ID, notification); // 保持服务常驻
+        startForeground(NOTIFICATION_ID, notification);
 
         handRefresh = new Handler();
         builder1 = new NotificationCompat.Builder(this, "foreground_service_channel")
@@ -74,9 +80,12 @@ public class NotificationService extends Service {
                 .setTicker("新消息")
                 .setWhen(System.currentTimeMillis())
                 .setAutoCancel(true)
-                .setDefaults(Notification.DEFAULT_ALL); // 确保激活声音，振动等
+                .setDefaults(Notification.DEFAULT_ALL)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setCategory(NotificationCompat.CATEGORY_ALARM)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
 
-        messageNotificatioManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        messageNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         messageIntent = new Intent(this, DetailActivity.class);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             messagePendingIntent = PendingIntent.getActivity(this, 0, messageIntent, PendingIntent.FLAG_MUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
@@ -99,7 +108,7 @@ public class NotificationService extends Service {
             CharSequence name = "120跟班";
             String description = "正在运行";
             String channelId = "foreground_service_channel";
-            int importance = NotificationManager.IMPORTANCE_HIGH; // 高重要性，确保不会错过通知
+            int importance = NotificationManager.IMPORTANCE_HIGH;
 
             NotificationChannel channel = new NotificationChannel(channelId, name, importance);
             channel.setDescription(description);
@@ -107,11 +116,13 @@ public class NotificationService extends Service {
             channel.setLightColor(Color.GREEN);
             channel.setShowBadge(true);
             channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+            channel.setBypassDnd(true);
 
             AudioAttributes audioAttributes = new AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
                     .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                     .build();
+            channel.setSound(imageTranslateUri(R.raw.msg), audioAttributes);
 
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
@@ -119,7 +130,7 @@ public class NotificationService extends Service {
     }
 
     private Notification buildForegroundNotification() {
-        Intent notificationIntent = new Intent(this, DetailActivity.class); // 点击通知时打开的Activity
+        Intent notificationIntent = new Intent(this, DetailActivity.class);
         PendingIntent pendingIntent;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_MUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
@@ -141,18 +152,21 @@ public class NotificationService extends Service {
         if (ttsManager != null) {
             ttsManager.shutdown();
         }
+        if (wakeLock != null && wakeLock.isHeld()) {
+            wakeLock.release();
+        }
         super.onDestroy();
     }
 
     class MessageThread extends Thread {
         public void run() {
-            while (true) {
+            while (!Thread.currentThread().isInterrupted()) {
                 try {
                     Thread.sleep(10000);
                     handRefresh.post(NotificationService.this::getTaskInfo);
                 } catch (InterruptedException e) {
                     Log.e(TAG, "MessageThread interrupted", e);
-                    break;
+                    Thread.currentThread().interrupt();
                 }
             }
         }
@@ -206,16 +220,26 @@ public class NotificationService extends Service {
                         JSONObject task = json.getJSONObject(0);
                         String taskNum = task.getString("taskNum");
                         if (!taskNum.isEmpty() && !taskNum.equals(taskNumber)) {
-                            builder1.setContentTitle("新任务");
-                            builder1.setContentText("您有新的任务。" + task.getString("sceneAddress"));
-                            builder1.setSound(imageTranslateUri(R.raw.msg));
-                            builder1.setContentIntent(messagePendingIntent); // 确保点击通知时可以打开相应的Activity
+                            wakeLock.acquire(10*60*1000L); // 10 minutes
+
+                            builder1.setContentTitle("新任务")
+                                    .setContentText("您有新的任务。" + task.getString("sceneAddress"))
+                                    .setSound(imageTranslateUri(R.raw.msg))
+                                    .setFullScreenIntent(messagePendingIntent, true);
+
                             Notification notification = builder1.build();
-                            messageNotificatioManager.notify(taskNum.hashCode(), notification); // 使用任务编号的 hash 作为通知 ID
+                            messageNotificationManager.notify(taskNum.hashCode(), notification);
                             taskNumber = taskNum;
 
                             // TTS播报新任务
-                            ttsManager.speak("您有新的任务", 3);
+                            ttsManager.speak("您有新的任务", 3, new TTSManager.OnTTSCompletionListener() {
+                                @Override
+                                public void onCompletion() {
+                                    if (wakeLock.isHeld()) {
+                                        wakeLock.release();
+                                    }
+                                }
+                            });
                         } else {
                             Log.d(TAG, "重复任务，忽略通知");
                         }
@@ -230,6 +254,9 @@ public class NotificationService extends Service {
             }
         } catch (Exception e) {
             Log.e(TAG, "Error in getTaskInfoCallback", e);
+            if (wakeLock.isHeld()) {
+                wakeLock.release();
+            }
         }
     }
 

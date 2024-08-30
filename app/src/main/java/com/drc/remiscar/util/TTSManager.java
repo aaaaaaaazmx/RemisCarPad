@@ -1,6 +1,7 @@
 package com.drc.remiscar.util;
 
 import android.content.Context;
+import android.media.AudioAttributes;
 import android.os.Build;
 import android.os.Handler;
 import android.speech.tts.TextToSpeech;
@@ -19,6 +20,11 @@ public class TTSManager implements TextToSpeech.OnInitListener {
     private Queue<String> messageQueue = new ArrayDeque<>();
     private int repeatCount = 0;
     private int currentRepeat = 0;
+    private OnTTSCompletionListener completionListener;
+
+    public interface OnTTSCompletionListener {
+        void onCompletion();
+    }
 
     public TTSManager(Context context) {
         this.context = context;
@@ -40,12 +46,17 @@ public class TTSManager implements TextToSpeech.OnInitListener {
                     currentRepeat++;
                     if (currentRepeat < repeatCount) {
                         speakNext();
+                    } else if (completionListener != null) {
+                        completionListener.onCompletion();
                     }
                 }
 
                 @Override
                 public void onError(String utteranceId) {
                     // Do nothing
+                    if (completionListener != null) {
+                        completionListener.onCompletion();
+                    }
                 }
             });
         }
@@ -67,16 +78,17 @@ public class TTSManager implements TextToSpeech.OnInitListener {
         }
     }
 
-    public void speak(String text, int repeat) {
+    public void speak(String text, int repeat, OnTTSCompletionListener listener) {
         this.repeatCount = repeat;
         this.currentRepeat = 0;
-        messageQueue.offer(text);  // Queue the message for later playback
+        this.completionListener = listener;
+        messageQueue.offer(text);
         if (isInitialized && tts != null) {
             speakNext();
         } else {
             Log.e("TTSManager", "TTS not initialized, queuing message");
             if (!isInitialized || null == tts) {
-                retryInitialization();  // Retry initializing if failed
+                retryInitialization();
             }
         }
     }
@@ -87,6 +99,8 @@ public class TTSManager implements TextToSpeech.OnInitListener {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "UniqueID");
             }
+        } else if (completionListener != null) {
+            completionListener.onCompletion();
         }
     }
 
@@ -113,5 +127,14 @@ public class TTSManager implements TextToSpeech.OnInitListener {
     private void retryInitialization() {
         // Retry after 10 seconds
         handler.postDelayed(this::initializeTTS, 10000);
+    }
+
+    public void setAudioAttributes(int usage) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            tts.setAudioAttributes(new AudioAttributes.Builder()
+                    .setUsage(usage)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                    .build());
+        }
     }
 }

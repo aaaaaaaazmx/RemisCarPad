@@ -1239,7 +1239,9 @@ public class DetailActivity extends Activity {
             public void onClick(DialogInterface dialog, int which) {
             }
         });
-        builder.create().show();
+        if (!isFinishing() && !isDestroyed()) {
+            builder.create().show();
+        }
     }
 
 

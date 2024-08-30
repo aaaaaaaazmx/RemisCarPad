@@ -54,6 +54,33 @@
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
 
 
+    <!-- 允许应用在后台运行 -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <!-- 允许应用在锁屏界面上显示内容 -->
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+
+    <!-- 允许应用在设备休眠时保持 CPU 运行 -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!-- 允许应用访问网络 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- 允许应用修改音频设置 -->
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+
+    <!-- 允许应用在其他应用之上显示内容 -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
+    <!-- 允许应用在启动时自动运行 -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!-- 允许应用震动设备 -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <!-- 如果您的应用需要在免打扰模式下播放声音，可能还需要以下权限 -->
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+
     <application
         android:name=".MyApplication"
         android:allowBackup="true"
