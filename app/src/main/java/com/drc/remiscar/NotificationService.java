@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.media.AudioAttributes;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Binder;
@@ -122,7 +123,8 @@ public class NotificationService extends Service {
                     .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
                     .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                     .build();
-            channel.setSound(imageTranslateUri(R.raw.msg), audioAttributes);
+//             channel.setSound(imageTranslateUri(R.raw.msg), audioAttributes);
+            channel.setSound(null, audioAttributes);
 
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
