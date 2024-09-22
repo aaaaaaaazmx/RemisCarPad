@@ -24,8 +24,8 @@ android {
                 // Add any specific arguments or annotation processors here if needed
             }
         }
-        versionCode 16
-        versionName "1.2.7"
+        versionCode 17
+        versionName "1.2.8"
 
         ndk {
             //设置支持的SO库架构（开发者可以根据需要，选择一个或多个平台的so）
@@ -81,6 +81,13 @@ android {
         debug.setRoot('build-types/debug')
         release.setRoot('build-types/release')
     }
+
+    viewBinding {
+        enabled = true
+    }
+    dataBinding{
+        enabled = true
+    }
 }
 
 dependencies {
@@ -104,4 +111,5 @@ dependencies {
     implementation "androidx.core:core-ktx:1.10.1"
     implementation 'io.github.justson:agentweb-core:v5.1.1-androidx'
     implementation 'androidx.multidex:multidex:2.0.1'
+    implementation "io.github.cymchad:BaseRecyclerViewAdapterHelper4:4.1.4"
 }
