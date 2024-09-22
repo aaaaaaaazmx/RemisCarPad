@@ -675,13 +675,14 @@ public class DetailActivity extends Activity {
         if (isAvilible(getBaseContext(), "com.autonavi.minimap")) {
             try {
                 String url = "";
-                if (_Lng != 0 && _Lat != 0)
+                if (_Lng != 0 && _Lat != 0) {
                     url = "androidamap://route?sourceApplication=softname&sname=我的位置&dlat=" + _Lat + "&dlon=" + _Lng + "&dname=" + labWaitAddress.getText().toString() + "&dev=0&m=0&t=0";
-                else
+                } else {
                     url = "androidamap://route?sourceApplication=softname&sname=我的位置&dname=" + labWaitAddress.getText().toString() + "&dev=0&m=0&t=0";
-                Intent intent = Intent.getIntent(url);
+                }
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url)); // 使用 Intent.ACTION_VIEW 来启动 Intent
                 startActivity(intent);
-            } catch (URISyntaxException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         } else {
@@ -787,22 +788,35 @@ public class DetailActivity extends Activity {
 
 
     public static boolean isAvilible(Context context, String packageName) {
+        if (context == null || packageName == null || packageName.isEmpty()) {
+            return false; // 无效输入检测
+        }
 
         final PackageManager packageManager = context.getPackageManager();
 
-        List<PackageInfo> packageInfos = packageManager.getInstalledPackages(0);
-
-        List<String> packageNames = new ArrayList<String>();
-
-        if (packageInfos != null) {
-            for (int i = 0; i < packageInfos.size(); i++) {
-                String packName = packageInfos.get(i).packageName;
-                packageNames.add(packName);
+        // 在 Android 11 (API 30) 或更高版本中使用更安全的方法
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            try {
+                packageManager.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES);
+                return true; // 找到了包名
+            } catch (PackageManager.NameNotFoundException e) {
+                return false; // 没有找到包名
             }
-        }
+        } else {
+            // 对于低于 Android 11 的版本
+            List<PackageInfo> packageInfos = packageManager.getInstalledPackages(0);
 
-        return packageNames.contains(packageName);
+            if (packageInfos != null) {
+                for (PackageInfo packageInfo : packageInfos) {
+                    if (packageName.equals(packageInfo.packageName)) {
+                        return true; // 找到了包名
+                    }
+                }
+            }
+            return false; // 没有找到包名
+        }
     }
+
 
     private void GetControl() {
         labTaskNum = findViewById(R.id.labTaskNum);

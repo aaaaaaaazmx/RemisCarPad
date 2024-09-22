@@ -739,15 +739,27 @@ public class TaskActivity extends Activity {
 
         if (!txtCarOutDate.getText().toString().isEmpty()) {
             taskInfo.setCarOutTime(txtCarOutDate.getText().toString());
-            outTime = datetimeFormat.parse(taskInfo.getCarOutTime());
+            try {
+                outTime = datetimeFormat.parse(taskInfo.getCarOutTime());
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
         }
         if (!txtArriveDate.getText().toString().isEmpty()) {
             taskInfo.setArriveSceneTime(txtArriveDate.getText().toString());
-            sceneTime = datetimeFormat.parse(taskInfo.getArriveSceneTime());
+            try {
+                sceneTime = datetimeFormat.parse(taskInfo.getArriveSceneTime());
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
         }
         if (!txtDestDate.getText().toString().isEmpty()) {
             taskInfo.setCarBackTime(txtDestDate.getText().toString());
-            backTime = datetimeFormat.parse(taskInfo.getCarBackTime());
+            try {
+                backTime = datetimeFormat.parse(taskInfo.getCarBackTime());
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
         }
         if (outTime != null && sceneTime != null && outTime.compareTo(sceneTime) >= 0) {
             alert("出车时间不能晚于到达现场时间");

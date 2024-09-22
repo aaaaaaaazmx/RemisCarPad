@@ -143,4 +143,9 @@
         <activity android:name=".NewsActivity" />
     </application>
 
+    <queries>
+        <!-- 允许查询的包名 -->
+        <package android:name="com.autonavi.minimap" />
+        <package android:name="com.google.android.apps.maps" />
+    </queries>
 </manifest>
