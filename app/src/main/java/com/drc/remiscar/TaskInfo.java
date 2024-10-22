@@ -15,12 +15,31 @@ public class TaskInfo
     private String destHospital;
     private String destHospitalId;
     private String carOutTime;
+    private String outHospTime;
     private String arriveSceneTime;
     private String patOnCarTime;
     private String carBackTime;
     private String carNumber;
     private String carLic;
     private String sceneAddress;
+    private String hospitalId;
+
+    public String getOutHospTime() {
+        return outHospTime;
+    }
+
+    public void setOutHospTime(String outHospTime) {
+        this.outHospTime = outHospTime;
+    }
+
+    public String getHospitalId() {
+        return hospitalId;
+    }
+
+    public void setHospitalId(String hospitalId) {
+        this.hospitalId = hospitalId;
+    }
+
     private java.util.ArrayList<patInfo> patInfos = new ArrayList<patInfo>();
 
     public Long getId() {

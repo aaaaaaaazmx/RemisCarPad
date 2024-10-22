@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -21,13 +22,17 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.TimePicker;
+
+import androidx.appcompat.widget.ViewUtils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -38,14 +43,16 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 
 import lombok.SneakyThrows;
 
-public class TaskActivity extends Activity {
+public class TaskActivity extends BaseActivity {
 
-    private TextView txtCarOutDate;
+    private TextView txtCarOutDate, txtOutHospitalDate;
     //private TextView txtCarOutTime;
     private TextView txtDestDate;
     //private TextView txtDestTime;
@@ -77,8 +84,10 @@ public class TaskActivity extends Activity {
 
     private Button btnOut;
     private Button btnOver;
-    private Button btnScene;
+    private Button btnScene, btnOutHospital;
     private Button btnHospital;
+
+    LinearLayout trOutHospital;
 
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
     SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd");
@@ -90,6 +99,8 @@ public class TaskActivity extends Activity {
     String _subConfirmTime = "";
     String _carNumber = "";
     TaskInfo _taskInfo;
+
+    String currentReceiverHospitalId;
 
     List<SysEnum> toWhereList =null;
 
@@ -183,6 +194,10 @@ public class TaskActivity extends Activity {
                 case "getToWhereEnum":
                     method = 8;
                     break;
+                case "ArrivedHospital":
+                    type = WebProxy.WebRequestType.Post;
+                    method = 9;
+                    break;
             }
 
             String result = null;
@@ -239,6 +254,10 @@ public class TaskActivity extends Activity {
                 case 8:
                     getToWhereEnumCallback(result);
                     break;
+                case 9:
+                    // 解析 {"code":"10000","msg":"操作成功","data":null,"timestamp":1729587599375}
+                    UpdateTime(txtOutHospitalDate, btnOutHospital, result);
+                    break;
             }
         }
     }
@@ -248,6 +267,11 @@ public class TaskActivity extends Activity {
             JSONObject data = JSONObject.parseObject(result);
             if (data != null && data.getString("code").equals("10000")) {
                 try {
+                    if (btn.getId() == btnOutHospital.getId()) {
+                        date.setText(formatTimestamp(data.getString("data")));
+                        btn.setEnabled(false);
+                        return;
+                    }
                     date.setText(datetimeFormat.format(datetimeFormat.parse(data.getString("data"))));
                     btn.setEnabled(false);
                     if (btn.getId() == btnOut.getId()) {
@@ -304,7 +328,33 @@ public class TaskActivity extends Activity {
             ArrayAdapter<Hospital> adapter = new ArrayAdapter<Hospital>(this, android.R.layout.simple_spinner_item, hospitalList);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             listHospital.setAdapter(adapter);
-            setSpinnerItemHospitalSelectedByID(listHospital, "-1");
+            setSpinnerItemHospitalSelectedByID(listHospital, TextUtils.isEmpty(currentReceiverHospitalId) ? "-1" : currentReceiverHospitalId);
+            listHospital.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    // 获取选中的项
+                    if (!hospitalList.isEmpty()) {
+                        String hospitalId = hospitalList.get(position).getHospitalId();
+                        if (!TextUtils.isEmpty(hospitalId)) {
+                            if (hospitalId.equals(currentReceiverHospitalId)) {
+                                trOutHospital.setVisibility(View.VISIBLE);
+                            } else {
+                                trOutHospital.setVisibility(View.GONE);
+                            }
+                        } else {
+                            trOutHospital.setVisibility(View.GONE);
+                        }
+                    } else {
+                        trOutHospital.setVisibility(View.GONE);
+                    }
+
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
         }
     }
 
@@ -315,12 +365,26 @@ public class TaskActivity extends Activity {
                 TaskInfo taskInfo = jsonObject.getJSONObject("data").toJavaObject(TaskInfo.class);
                 _taskInfo = taskInfo;
                 _carNumber = taskInfo.getCarNumber();
+                // 当前接单人的自身医院
+                // The current receiver's own hospital
+                currentReceiverHospitalId = taskInfo.getHospitalId();
+                setSpinnerItemHospitalSelectedByID(listHospital, TextUtils.isEmpty(currentReceiverHospitalId) ? "-1" : currentReceiverHospitalId);
                 try {
                     if (taskInfo.getCarOutTime() != null && !taskInfo.getCarOutTime().isEmpty()) {
                         txtCarOutDate.setText(datetimeFormat.format(new Date(Long.valueOf(taskInfo.getCarOutTime()))));
                         //txtCarOutTime.setText(timeFormat.format(new Date(Long.valueOf(taskInfo.getCarOutTime()))));
                         this.btnOut.setEnabled(false);
+                    } else {
+                        this.btnOut.setEnabled(true);
                     }
+                    if (taskInfo.getOutHospTime() !=null && !taskInfo.getOutHospTime().isEmpty()) {
+                        trOutHospital.setVisibility(View.VISIBLE);
+                        txtOutHospitalDate.setText(formatTimestamp(taskInfo.getOutHospTime()));
+                        btnOutHospital.setEnabled(false);
+                    }  else {
+                        btnOutHospital.setEnabled(true);
+                    }
+
                     if (taskInfo.getArriveSceneTime() != null && !taskInfo.getArriveSceneTime().isEmpty()) {
                         txtArriveDate.setText(datetimeFormat.format(new Date(Long.valueOf(taskInfo.getArriveSceneTime()))));
                         //txtArriveTime.setText(timeFormat.format(new Date(Long.valueOf(taskInfo.getArriveSceneTime()))));
@@ -371,10 +435,10 @@ public class TaskActivity extends Activity {
             bunle.putString("over", "ok");
             intent.putExtras(bunle);
             setResult(RESULT_OK, intent);  //设置返回结果
-            alert("任务结束成功");
+            alert("任务结束成功", this);
             finish(); //关闭子窗口，否则数据无法返回
         } else {
-            alert("任务结束失败"+res.getString("msg"));
+            alert("任务结束失败"+res.getString("msg"), this);
         }
     }
 
@@ -386,10 +450,10 @@ public class TaskActivity extends Activity {
             bunle.putString("over", "ok");
             intent.putExtras(bunle);
             setResult(RESULT_OK, intent);  //设置返回结果
-            alert("保存成功");
+            alert("保存成功", this);
             finish(); //关闭子窗口，否则数据无法返回
         } else {
-            alert("保存信息失败");
+            alert("保存信息失败", this);
         }
     }
 
@@ -406,6 +470,7 @@ public class TaskActivity extends Activity {
 
     public void setSpinnerItemHospitalSelectedByID(Spinner spinner, String id) {
         SpinnerAdapter spAdapter = spinner.getAdapter(); //得到SpinnerAdapter对象
+        if (null == spAdapter) return;
         int k = spAdapter.getCount();
         for (int i = 0; i < k; i++) {
             if (id.equals(((Hospital) spAdapter.getItem(i)).getHospitalId())) {
@@ -490,6 +555,7 @@ public class TaskActivity extends Activity {
     }
 
     private void GetControl() {
+        trOutHospital = findViewById(R.id.trOutHospital);
         btnOut = findViewById(R.id.btnOut);
         btnOut.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -511,19 +577,19 @@ public class TaskActivity extends Activity {
                 try {
 
                     if (chkEmpty.isChecked() && listEmptyReason.getSelectedItem().toString().isEmpty()) {
-                        alert("请选择跑空原因");
+                        alert("请选择跑空原因", TaskActivity.this);
                         return;
                     }
                     if (txtCarOutDate.getText().toString().isEmpty()) {
-                        alert("请点击出车按钮填写出车时间");
+                        alert("请点击出车按钮填写出车时间", TaskActivity.this);
                         return;
                     }
                     if (txtArriveDate.getText().toString().isEmpty()) {
-                        alert("请点击到达现场按钮填写到达现场时间");
+                        alert("请点击到达现场按钮填写到达现场时间", TaskActivity.this);
                         return;
                     }
                     if (txtDestDate.getText().toString().isEmpty()) {
-                        alert("请点击送达医院按钮填写送达医院时间");
+                        alert("请点击送达医院按钮填写送达医院时间", TaskActivity.this);
                         return;
                     }
 //                    if (!chkEmpty.isChecked() && apsAdapter.getCount() == 0) {
@@ -541,6 +607,18 @@ public class TaskActivity extends Activity {
         btnHospital.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // 判断出车时间
+                if (TextUtils.isEmpty(txtCarOutDate.getText().toString())) {
+                    // 未出车
+                    alert("请点击出车按钮填写出车时间", TaskActivity.this);
+                    return;
+                }
+                // 判断到达现场时间
+                if (TextUtils.isEmpty(txtArriveDate.getText().toString())) {
+                    // 未到达现场
+                    alert("请点击到达现场按钮填写到达现场时间", TaskActivity.this);
+                    return;
+                }
                 try {
                     String url = String.format(DetailActivity._Comeback, DetailActivity._ServerIP, DetailActivity._ServerPort, _taskId);
                     loadJSONStringTask loadJSON = new loadJSONStringTask();
@@ -554,6 +632,12 @@ public class TaskActivity extends Activity {
         btnScene.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // 判断是否已经出车
+                if (TextUtils.isEmpty(txtCarOutDate.getText().toString())) {
+                    // 未出车
+                    alert("请点击出车按钮填写出车时间", TaskActivity.this);
+                    return;
+                }
                 try {
                     String url = String.format(DetailActivity._ArrivedScene, DetailActivity._ServerIP, DetailActivity._ServerPort, _taskId);
                     loadJSONStringTask loadJSON = new loadJSONStringTask();
@@ -561,6 +645,29 @@ public class TaskActivity extends Activity {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+            }
+        });
+        // 送达外院
+        txtOutHospitalDate = findViewById(R.id.txtOutHospitalDate);
+        btnOutHospital = findViewById(R.id.btnOutHospital);
+        btnOutHospital.setOnClickListener(v -> {
+            // 需要判断是否出车
+            if (TextUtils.isEmpty(txtCarOutDate.getText().toString())) {
+                alert("请点击出车按钮填写出车时间", TaskActivity.this);
+                return;
+            }
+            // 需要判断到达时间
+            if (TextUtils.isEmpty(txtArriveDate.getText().toString())) {
+                alert("请点击到达现场按钮填写到达现场时间", TaskActivity.this);
+                return;
+            }
+            // 然后请求接口，获取到达时间
+            try {
+                String url = String.format(DetailActivity._OutHosp, DetailActivity._ServerIP, DetailActivity._ServerPort, _taskId);
+                loadJSONStringTask loadJSON = new loadJSONStringTask();
+                loadJSON.execute(url, "ArrivedHospital");
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
         txtCarOutDate = findViewById(R.id.txtCarOutDate);
@@ -654,7 +761,7 @@ public class TaskActivity extends Activity {
             @Override
             public void onClick(View v) {
                 if (chkEmpty.isChecked() && listEmptyReason.getSelectedItem().toString().isEmpty()) {
-                    alert("请选择跑空原因");
+                    alert("请选择跑空原因", TaskActivity.this);
                     return;
                 }
 //                if (!chkEmpty.isChecked() && apsAdapter.getCount() == 0) {
@@ -762,17 +869,17 @@ public class TaskActivity extends Activity {
             }
         }
         if (outTime != null && sceneTime != null && outTime.compareTo(sceneTime) >= 0) {
-            alert("出车时间不能晚于到达现场时间");
+            alert("出车时间不能晚于到达现场时间", TaskActivity.this);
             return;
         }
 
         if (sceneTime != null && backTime != null && sceneTime.compareTo(backTime) >= 0) {
-            alert("到达现场时间不能晚于送达医院时间");
+            alert("到达现场时间不能晚于送达医院时间", TaskActivity.this);
             return;
         }
 
         if (sceneTime == null && backTime != null && outTime != null && outTime.compareTo(backTime) >= 0) {
-            alert("出车时间不能晚于送达医院时间");
+            alert("出车时间不能晚于送达医院时间", TaskActivity.this);
             return;
         }
         taskInfo.setCarNumber(_carNumber);
@@ -829,6 +936,7 @@ public class TaskActivity extends Activity {
 
     private void InitControl() {
         try {
+            btnOut.setEnabled(false);
             btnScene.setEnabled(false);
             btnHospital.setEnabled(false);
 //            if(!_subConfirmTime.isEmpty()){
@@ -845,14 +953,17 @@ public class TaskActivity extends Activity {
         }
     }
 
-    public void alert(String msg) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(TaskActivity.this);
-        builder.setMessage(msg);
-        builder.setTitle("信息");
-        builder.setPositiveButton("确定", new android.content.DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-            }
-        });
-        builder.create().show();
+    // 方法：将时间戳转换为指定格式的日期字符串
+    public  String formatTimestamp(String timestamp) {
+        // 定义输入和输出时间格式
+        DateTimeFormatter inputFormatter = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            inputFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+            DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            // 解析时间戳并格式化
+            LocalDateTime dateTime = LocalDateTime.parse(timestamp, inputFormatter);
+            return dateTime.format(outputFormatter);
+        }
+        return "";
     }
 }

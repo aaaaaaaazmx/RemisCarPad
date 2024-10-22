@@ -20,6 +20,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.speech.tts.UtteranceProgressListener;
+import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.RequiresApi;
@@ -220,6 +221,11 @@ public class NotificationService extends Service {
                     JSONArray json = JSONArray.parseArray(result.getString("data"));
                     if (!json.isEmpty()) {
                         JSONObject task = json.getJSONObject(0);
+                        String carOutTime = task.getString("carOutTime");
+                        // 如果这个时间不为null，那么就不播报了。说明有人接单了。
+                        if (!TextUtils.isEmpty(carOutTime)) {
+                            return;
+                        }
                         String taskNum = task.getString("taskNum");
                         if (!taskNum.isEmpty() && !taskNum.equals(taskNumber)) {
                             wakeLock.acquire(10*60*1000L); // 10 minutes

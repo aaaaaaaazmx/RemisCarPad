@@ -7,21 +7,23 @@
             android:layout_height="match_parent"
             android:textSize="35sp">
 
-            <TableRow
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" android:layout_margin="1dip"
                 android:background="#cdcdcd" >
 
                 <TextView
+                    android:layout_weight="1"
                     android:id="@+id/labText0"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:text="出车时间"
+                    android:text="出车时间   "
                     android:textColor="#EE7600"
                     android:textSize="15sp" />
 
                 <TextView
+                    android:layout_weight="1"
                     android:id="@+id/txtCarOutDate"
                     android:layout_width="wrap_content"
                     android:layout_height="46dp"
@@ -40,15 +42,16 @@
                     android:textColor="#ff0000"
                     android:textSize="15sp" />
 
-            </TableRow>
-            <TableRow
+            </LinearLayout>
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" android:layout_margin="1dip"
                 android:background="#cdcdcd" >
 
                 <TextView
+                    android:layout_weight="1"
                     android:id="@+id/labText2"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:text="到达现场时间"
@@ -56,8 +59,9 @@
                     android:textSize="15sp" />
 
                 <TextView
+                    android:layout_weight="1"
                     android:id="@+id/txtArriveDate"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="46dp"
                     android:gravity="center_horizontal|center_vertical"
                     android:inputType="none"
@@ -73,49 +77,16 @@
                     android:text="到达现场"
                     android:textColor="#ff0000"
                     android:textSize="15sp" />
-            </TableRow>
-            <TableRow
+            </LinearLayout>
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" android:layout_margin="1dip"
                 android:background="#cdcdcd" >
 
                 <TextView
-                    android:id="@+id/labText3"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:hint="请选择时间"
-                    android:text="送到医院时间"
-                    android:textColor="#EE7600"
-                    android:textSize="15sp" />
-
-                <TextView
-                    android:id="@+id/txtDestDate"
-                    android:layout_width="match_parent"
-                    android:layout_height="46dp"
-                    android:gravity="center_horizontal|center_vertical"
-                    android:inputType="none"
-                    android:singleLine="false"
-                    android:text="2021-07-29 01:00:00"
-                    android:textColor="#912CEE"
-                    android:textSize="15sp" />
-
-                <Button
-                    android:id="@+id/btnHospital"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="送达医院"
-                    android:textColor="#ff0000"
-                    android:textSize="15sp" />
-            </TableRow>
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" android:layout_margin="1dip"
-                android:background="#cdcdcd" >
-
-                <TextView
+                    android:layout_weight="1"
                     android:id="@+id/labText4"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:text="送到医院"
@@ -123,20 +94,97 @@
                     android:textSize="15sp" />
 
                 <Spinner
+                    android:layout_weight="1"
                     android:id="@+id/listHospital"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="45dp"
-                    android:layout_span="3" />
+                    />
 
-            </TableRow>
-            <TableRow
+            </LinearLayout>
+
+            <LinearLayout
+                android:visibility="gone"
+                android:id="@+id/trOutHospital"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" android:layout_margin="1dip"
                 android:background="#cdcdcd" >
 
                 <TextView
+                    android:layout_weight="1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:hint="请选择时间"
+                    android:text="送达外院时间"
+                    android:textColor="#EE7600"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:layout_weight="1"
+                    android:id="@+id/txtOutHospitalDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="46dp"
+                    android:gravity="center_horizontal|center_vertical"
+                    android:inputType="none"
+                    android:singleLine="false"
+                    android:textColor="#912CEE"
+                    android:textSize="15sp" />
+
+                <Button
+                    android:id="@+id/btnOutHospital"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="送达外院"
+                    android:textColor="#ff0000"
+                    android:textSize="15sp" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" android:layout_margin="1dip"
+                android:background="#cdcdcd" >
+
+                <TextView
+                    android:layout_weight="1"
+                    android:id="@+id/labText3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:hint="请选择时间"
+                    android:text="返回医院时间"
+                    android:textColor="#EE7600"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:layout_weight="1"
+                    android:id="@+id/txtDestDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="46dp"
+                    android:gravity="center_horizontal|center_vertical"
+                    android:inputType="none"
+                    android:singleLine="false"
+                    android:textColor="#912CEE"
+                    android:textSize="15sp" />
+
+                <Button
+                    android:id="@+id/btnHospital"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="返回医院"
+                    android:textColor="#ff0000"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="1dip"
+                android:background="#cdcdcd" >
+
+                <TextView
+                    android:layout_weight="3"
                     android:id="@+id/labText5"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:text="跑空车原因"
@@ -144,6 +192,8 @@
                     android:textSize="15sp" />
 
                 <CheckBox
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
                     android:id="@+id/chkEmpty"
                     android:layout_gravity="center_horizontal|center_vertical"
                     android:text="跑空车"
@@ -152,27 +202,28 @@
 
                 <Spinner
                     android:id="@+id/listEmptyReason"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="45dp"
-                    android:layout_span="3" />
+                    />
 
-            </TableRow>
-            <TableRow
+            </LinearLayout>
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" android:layout_margin="1dip"
                 android:background="#cdcdcd" >
 
                 <TextView
+                    android:layout_weight="1"
                     android:id="@+id/labText6"
-                    android:layout_width="350dp"
+                    android:layout_width="150dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:layout_span="4"
                     android:text="病人信息"
                     android:textColor="#EE7600"
                     android:textSize="15sp" />
 
                 <Button
+                    android:layout_marginEnd="5dp"
                     android:id="@+id/btnAdd"
                     android:layout_width="90dp"
                     android:layout_height="wrap_content"
@@ -188,7 +239,7 @@
                     android:textColor="#ff0000"
                     android:textSize="16sp" />
 
-            </TableRow>
+            </LinearLayout>
 
             <TableRow
                 android:layout_width="match_parent"

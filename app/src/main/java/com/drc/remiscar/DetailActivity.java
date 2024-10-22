@@ -83,7 +83,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DetailActivity extends Activity {
+public class DetailActivity extends BaseActivity {
 
     private static final Logger log = LoggerFactory.getLogger(DetailActivity.class);
     TextView labTaskNum = null;
@@ -127,6 +127,9 @@ public class DetailActivity extends Activity {
     private TabHost tabhost;
     private TabWidget tabs;
 
+    //_carOutTime
+    private String txtCarOutDate;
+
     String CITY = "怀化";
     String Lng = "";
     String Lat = "";
@@ -147,6 +150,8 @@ public class DetailActivity extends Activity {
     public final static String _Comeback = "http://%s:%s/gskj-cloud120/api/RemisCarPad/Comeback/%s";
     public final static String _ArrivedScene = "http://%s:%s/gskj-cloud120/api/RemisCarPad/ArrivedScene/%s";
     public final static String _OutCar = "http://%s:%s/gskj-cloud120/api/RemisCarPad/OutCar/%s";
+    // 送大外院时间 /api/RemisCarPad/OutHosp/{id}
+    public final static String _OutHosp = "http://%s:%s/gskj-cloud120/api/RemisCarPad/OutHosp/%s";
     public final static String _ENUM_EMPTY_REASON = "340";
     public final static String _ENUM_EMPTY_TOWHERE = "397";
     public static String _Url = "";
@@ -574,7 +579,7 @@ public class DetailActivity extends Activity {
                         GetPadNo();
                         break;
                     case 3:
-                        alert("当前版本号：" + VersionUtil.getVersionName(DetailActivity.this));
+                        alert("当前版本号：" + VersionUtil.getVersionName(DetailActivity.this), DetailActivity.this);
                         break;
                     case 4:
                         readLog();
@@ -686,7 +691,7 @@ public class DetailActivity extends Activity {
                 e.printStackTrace();
             }
         } else {
-            alert("未安装高德地图APP");
+            alert("未安装高德地图APP", DetailActivity.this);
         }
     }
 
@@ -724,7 +729,7 @@ public class DetailActivity extends Activity {
             intent.setData(Uri.parse(fromTo.toString()));
             context.startActivity(intent);
         } else {
-            alert("未安装腾讯地图");
+            alert("未安装腾讯地图", DetailActivity.this);
         }
     }
 
@@ -737,7 +742,7 @@ public class DetailActivity extends Activity {
 //                setAirPlaneMode(this,true);
 //                reNetwork();
             } else {
-                alert("未安装百度地图APP");
+                alert("未安装百度地图APP", DetailActivity.this);
                 startNaviGao();
                 //setUpGaodeAppByMine();
             }
@@ -875,7 +880,7 @@ public class DetailActivity extends Activity {
             } catch (IOException e) {
                 // Use a Handler to post on the main thread
                 new Handler(Looper.getMainLooper()).post(() -> {
-                    alert("网络异常：" + e.getMessage());
+                    alert("网络异常：" + e.getMessage(), DetailActivity.this);
                     writeFile("errorIO.log", e.toString());
                 });
             }
@@ -946,7 +951,7 @@ public class DetailActivity extends Activity {
         if (result != null && !result.equals("null")) {
             JSONObject json = JSONObject.parseObject(result);
             if (json.getString("code").equals("10000")) {
-                alert("确认成功");
+                alert("确认成功", DetailActivity.this);
                 this.btnOkRevice.setEnabled(false);
                 this.btnTaskOver.setEnabled(true);
                 // 当没有收到正确的结果时，停止TTS播放
@@ -1104,7 +1109,7 @@ public class DetailActivity extends Activity {
                     Location loc = location.toJavaObject(Location.class);
                     DetailActivity.this._Lat = loc.lat;
                     DetailActivity.this._Lng = loc.lng;
-                    alert(String.format("手机精确定位数据已确认：经度【%s】，纬度【%s】，地址：%s", loc.lng, loc.lat, loc.addr));
+                    alert(String.format("手机精确定位数据已确认：经度【%s】，纬度【%s】，地址：%s", loc.lng, loc.lat, loc.addr), DetailActivity.this);
                     _geoThread.isRunning = false;
                 }
             }
@@ -1136,6 +1141,8 @@ public class DetailActivity extends Activity {
     private void loadFromJson(JSONObject json) {
         if (json != null) {
             try {
+                // 获取carOutTime
+                txtCarOutDate = json.getString("carOutTime");
                 _alterNumber = json.getString("alterNumber");
                 _taskId = json.getString("id");
                 labTaskNum.setText(GetNoNullString(json.getString("taskNum")));
@@ -1243,19 +1250,6 @@ public class DetailActivity extends Activity {
             value = "";
         }
         return value;
-    }
-
-    public void alert(String msg) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(DetailActivity.this);
-        builder.setMessage(msg);
-        builder.setTitle("信息");
-        builder.setPositiveButton("确定", new android.content.DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-            }
-        });
-        if (!isFinishing() && !isDestroyed()) {
-            builder.create().show();
-        }
     }
 
 
