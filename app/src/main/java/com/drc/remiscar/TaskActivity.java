@@ -336,7 +336,7 @@ public class TaskActivity extends BaseActivity {
                     if (!hospitalList.isEmpty()) {
                         String hospitalId = hospitalList.get(position).getHospitalId();
                         if (!TextUtils.isEmpty(hospitalId)) {
-                            if (hospitalId.equals(currentReceiverHospitalId)) {
+                            if (!hospitalId.equals(currentReceiverHospitalId)) {
                                 trOutHospital.setVisibility(View.VISIBLE);
                             } else {
                                 trOutHospital.setVisibility(View.GONE);
@@ -435,10 +435,10 @@ public class TaskActivity extends BaseActivity {
             bunle.putString("over", "ok");
             intent.putExtras(bunle);
             setResult(RESULT_OK, intent);  //设置返回结果
-            alert("任务结束成功", this);
+            alert("任务结束成功");
             finish(); //关闭子窗口，否则数据无法返回
         } else {
-            alert("任务结束失败"+res.getString("msg"), this);
+            alert("任务结束失败"+res.getString("msg"));
         }
     }
 
@@ -450,10 +450,10 @@ public class TaskActivity extends BaseActivity {
             bunle.putString("over", "ok");
             intent.putExtras(bunle);
             setResult(RESULT_OK, intent);  //设置返回结果
-            alert("保存成功", this);
+            alert("保存成功");
             finish(); //关闭子窗口，否则数据无法返回
         } else {
-            alert("保存信息失败", this);
+            alert("保存信息失败");
         }
     }
 
@@ -577,19 +577,19 @@ public class TaskActivity extends BaseActivity {
                 try {
 
                     if (chkEmpty.isChecked() && listEmptyReason.getSelectedItem().toString().isEmpty()) {
-                        alert("请选择跑空原因", TaskActivity.this);
+                        alert("请选择跑空原因");
                         return;
                     }
                     if (txtCarOutDate.getText().toString().isEmpty()) {
-                        alert("请点击出车按钮填写出车时间", TaskActivity.this);
+                        alert("请点击出车按钮填写出车时间");
                         return;
                     }
                     if (txtArriveDate.getText().toString().isEmpty()) {
-                        alert("请点击到达现场按钮填写到达现场时间", TaskActivity.this);
+                        alert("请点击到达现场按钮填写到达现场时间");
                         return;
                     }
                     if (txtDestDate.getText().toString().isEmpty()) {
-                        alert("请点击送达医院按钮填写送达医院时间", TaskActivity.this);
+                        alert("请点击送达医院按钮填写送达医院时间");
                         return;
                     }
 //                    if (!chkEmpty.isChecked() && apsAdapter.getCount() == 0) {
@@ -610,13 +610,13 @@ public class TaskActivity extends BaseActivity {
                 // 判断出车时间
                 if (TextUtils.isEmpty(txtCarOutDate.getText().toString())) {
                     // 未出车
-                    alert("请点击出车按钮填写出车时间", TaskActivity.this);
+                    alert("请点击出车按钮填写出车时间");
                     return;
                 }
                 // 判断到达现场时间
                 if (TextUtils.isEmpty(txtArriveDate.getText().toString())) {
                     // 未到达现场
-                    alert("请点击到达现场按钮填写到达现场时间", TaskActivity.this);
+                    alert("请点击到达现场按钮填写到达现场时间");
                     return;
                 }
                 try {
@@ -635,7 +635,7 @@ public class TaskActivity extends BaseActivity {
                 // 判断是否已经出车
                 if (TextUtils.isEmpty(txtCarOutDate.getText().toString())) {
                     // 未出车
-                    alert("请点击出车按钮填写出车时间", TaskActivity.this);
+                    alert("请点击出车按钮填写出车时间");
                     return;
                 }
                 try {
@@ -653,12 +653,12 @@ public class TaskActivity extends BaseActivity {
         btnOutHospital.setOnClickListener(v -> {
             // 需要判断是否出车
             if (TextUtils.isEmpty(txtCarOutDate.getText().toString())) {
-                alert("请点击出车按钮填写出车时间", TaskActivity.this);
+                alert("请点击出车按钮填写出车时间");
                 return;
             }
             // 需要判断到达时间
             if (TextUtils.isEmpty(txtArriveDate.getText().toString())) {
-                alert("请点击到达现场按钮填写到达现场时间", TaskActivity.this);
+                alert("请点击到达现场按钮填写到达现场时间");
                 return;
             }
             // 然后请求接口，获取到达时间
@@ -761,7 +761,7 @@ public class TaskActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 if (chkEmpty.isChecked() && listEmptyReason.getSelectedItem().toString().isEmpty()) {
-                    alert("请选择跑空原因", TaskActivity.this);
+                    alert("请选择跑空原因");
                     return;
                 }
 //                if (!chkEmpty.isChecked() && apsAdapter.getCount() == 0) {
@@ -869,17 +869,17 @@ public class TaskActivity extends BaseActivity {
             }
         }
         if (outTime != null && sceneTime != null && outTime.compareTo(sceneTime) >= 0) {
-            alert("出车时间不能晚于到达现场时间", TaskActivity.this);
+            alert("出车时间不能晚于到达现场时间");
             return;
         }
 
         if (sceneTime != null && backTime != null && sceneTime.compareTo(backTime) >= 0) {
-            alert("到达现场时间不能晚于送达医院时间", TaskActivity.this);
+            alert("到达现场时间不能晚于送达医院时间");
             return;
         }
 
         if (sceneTime == null && backTime != null && outTime != null && outTime.compareTo(backTime) >= 0) {
-            alert("出车时间不能晚于送达医院时间", TaskActivity.this);
+            alert("出车时间不能晚于送达医院时间");
             return;
         }
         taskInfo.setCarNumber(_carNumber);
@@ -888,7 +888,9 @@ public class TaskActivity extends BaseActivity {
         taskInfo.setId(Long.valueOf(_taskId));
         taskInfo.setDestHospitalId(((Hospital) listHospital.getSelectedItem()).hospitalId);
         taskInfo.setDestHospital(((Hospital) listHospital.getSelectedItem()).hospitalName);
-        taskInfo.setEmptyReason(((SysEnum) listEmptyReason.getSelectedItem()).Id);
+        if (listEmptyReason.getSelectedItem() != null){
+            taskInfo.setEmptyReason(((SysEnum) listEmptyReason.getSelectedItem()).Id);
+        }
         taskInfo.setAlterNumber(_alterNumber);
         taskInfo.setTaskNumber(_taskNum);
         taskInfo.setEnd(_isEnd);

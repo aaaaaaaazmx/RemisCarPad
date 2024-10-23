@@ -579,7 +579,7 @@ public class DetailActivity extends BaseActivity {
                         GetPadNo();
                         break;
                     case 3:
-                        alert("当前版本号：" + VersionUtil.getVersionName(DetailActivity.this), DetailActivity.this);
+                        alert("当前版本号：" + VersionUtil.getVersionName(DetailActivity.this));
                         break;
                     case 4:
                         readLog();
@@ -691,7 +691,7 @@ public class DetailActivity extends BaseActivity {
                 e.printStackTrace();
             }
         } else {
-            alert("未安装高德地图APP", DetailActivity.this);
+            alert("未安装高德地图APP");
         }
     }
 
@@ -729,7 +729,7 @@ public class DetailActivity extends BaseActivity {
             intent.setData(Uri.parse(fromTo.toString()));
             context.startActivity(intent);
         } else {
-            alert("未安装腾讯地图", DetailActivity.this);
+            alert("未安装腾讯地图");
         }
     }
 
@@ -742,7 +742,7 @@ public class DetailActivity extends BaseActivity {
 //                setAirPlaneMode(this,true);
 //                reNetwork();
             } else {
-                alert("未安装百度地图APP", DetailActivity.this);
+                alert("未安装百度地图APP");
                 startNaviGao();
                 //setUpGaodeAppByMine();
             }
@@ -880,7 +880,7 @@ public class DetailActivity extends BaseActivity {
             } catch (IOException e) {
                 // Use a Handler to post on the main thread
                 new Handler(Looper.getMainLooper()).post(() -> {
-                    alert("网络异常：" + e.getMessage(), DetailActivity.this);
+                    alert("网络异常：" + e.getMessage());
                     writeFile("errorIO.log", e.toString());
                 });
             }
@@ -951,7 +951,7 @@ public class DetailActivity extends BaseActivity {
         if (result != null && !result.equals("null")) {
             JSONObject json = JSONObject.parseObject(result);
             if (json.getString("code").equals("10000")) {
-                alert("确认成功", DetailActivity.this);
+                alert("确认成功");
                 this.btnOkRevice.setEnabled(false);
                 this.btnTaskOver.setEnabled(true);
                 // 当没有收到正确的结果时，停止TTS播放
@@ -1109,7 +1109,7 @@ public class DetailActivity extends BaseActivity {
                     Location loc = location.toJavaObject(Location.class);
                     DetailActivity.this._Lat = loc.lat;
                     DetailActivity.this._Lng = loc.lng;
-                    alert(String.format("手机精确定位数据已确认：经度【%s】，纬度【%s】，地址：%s", loc.lng, loc.lat, loc.addr), DetailActivity.this);
+                    alert(String.format("手机精确定位数据已确认：经度【%s】，纬度【%s】，地址：%s", loc.lng, loc.lat, loc.addr));
                     _geoThread.isRunning = false;
                 }
             }
