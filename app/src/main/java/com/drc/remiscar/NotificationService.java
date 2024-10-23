@@ -121,7 +121,7 @@ public class NotificationService extends Service {
             channel.setBypassDnd(true);
 
             AudioAttributes audioAttributes = new AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+                    .setUsage(AudioAttributes.USAGE_ALARM)
                     .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                     .build();
 //             channel.setSound(imageTranslateUri(R.raw.msg), audioAttributes);
@@ -228,7 +228,7 @@ public class NotificationService extends Service {
                         }
                         String taskNum = task.getString("taskNum");
                         if (!taskNum.isEmpty() && !taskNum.equals(taskNumber)) {
-                            wakeLock.acquire(10*60*1000L); // 10 minutes
+                            wakeLock.acquire(10*60*1000000L); // 10 minutes
 
                             builder1.setContentTitle("新任务")
                                     .setContentText("您有新的任务。" + task.getString("sceneAddress"))
@@ -244,7 +244,7 @@ public class NotificationService extends Service {
                                 @Override
                                 public void onCompletion() {
                                     if (wakeLock.isHeld()) {
-                                        wakeLock.release();
+                                        // wakeLock.release();
                                     }
                                 }
                             });
@@ -263,7 +263,7 @@ public class NotificationService extends Service {
         } catch (Exception e) {
             Log.e(TAG, "Error in getTaskInfoCallback", e);
             if (wakeLock.isHeld()) {
-                wakeLock.release();
+                // wakeLock.release();
             }
         }
     }

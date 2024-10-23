@@ -2,6 +2,7 @@ package com.drc.remiscar.util;
 
 import android.content.Context;
 import android.media.AudioAttributes;
+import android.media.AudioManager;
 import android.os.Build;
 import android.os.Handler;
 import android.speech.tts.TextToSpeech;
@@ -21,6 +22,7 @@ public class TTSManager implements TextToSpeech.OnInitListener {
     private int repeatCount = 0;
     private int currentRepeat = 0;
     private OnTTSCompletionListener completionListener;
+    private AudioManager audioManager;
 
     public interface OnTTSCompletionListener {
         void onCompletion();
@@ -29,6 +31,7 @@ public class TTSManager implements TextToSpeech.OnInitListener {
     public TTSManager(Context context) {
         this.context = context;
         this.handler = new Handler();
+        this.audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         initializeTTS();
     }
 
@@ -53,7 +56,7 @@ public class TTSManager implements TextToSpeech.OnInitListener {
 
                 @Override
                 public void onError(String utteranceId) {
-                    // Do nothing
+                    // Handle error
                     if (completionListener != null) {
                         completionListener.onCompletion();
                     }
@@ -84,7 +87,7 @@ public class TTSManager implements TextToSpeech.OnInitListener {
         this.completionListener = listener;
         messageQueue.offer(text);
         if (isInitialized && tts != null) {
-            speakNext();
+            attemptToSpeak();
         } else {
             Log.e("TTSManager", "TTS not initialized, queuing message");
             if (!isInitialized || null == tts) {
@@ -92,6 +95,32 @@ public class TTSManager implements TextToSpeech.OnInitListener {
             }
         }
     }
+
+    private void attemptToSpeak() {
+        if (requestAudioFocus()) { // 请求音频焦点
+            speakNext();
+        } else {
+            Log.e("TTSManager", "Failed to gain audio focus, retrying...");
+            handler.postDelayed(this::attemptToSpeak, 5000); // 5秒后重试
+        }
+    }
+
+    private boolean requestAudioFocus() {
+        int result = audioManager.requestAudioFocus(focusChangeListener,
+                AudioManager.STREAM_MUSIC,
+                AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK); // 尝试允许在其他音频背景下播报
+        return result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
+    }
+
+    private AudioManager.OnAudioFocusChangeListener focusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
+        @Override
+        public void onAudioFocusChange(int focusChange) {
+            if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
+                // 失去音频焦点
+                Log.e("TTSManager", "Lost audio focus");
+            }
+        }
+    };
 
     private void speakNext() {
         if (isInitialized && tts != null && !messageQueue.isEmpty()) {
