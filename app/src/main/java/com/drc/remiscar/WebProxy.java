@@ -3,6 +3,7 @@ package com.drc.remiscar;
 import android.accounts.NetworkErrorException;
 import android.annotation.TargetApi;
 import android.os.Build;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,6 +32,7 @@ public class WebProxy {
 		String retSrc = "";
 
 			OkHttpClient client = new OkHttpClient();
+			Log.i("123123123 url", url);
             Request request = null;
             if(webRequestType == WebRequestType.Get) {
                 request = new Request.Builder()
@@ -53,6 +55,7 @@ public class WebProxy {
 		try {
 			response = client.newCall(request).execute();
 			retSrc= response.body().string();
+			Log.i("123123123", retSrc);
 		} catch (IOException e) {
 			throw e;
 		}
