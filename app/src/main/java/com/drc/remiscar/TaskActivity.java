@@ -278,6 +278,9 @@ public class TaskActivity extends BaseActivity {
                         if (this.txtArriveDate.getText().toString().isEmpty()) {
                             btnScene.setEnabled(true);
                         }
+                        if (txtDestDate.getText().toString().isEmpty()) {
+                            btnHospital.setEnabled(true);
+                        }
                     } else if (btn.getId() == btnScene.getId()) {
                         if (this.txtDestDate.getText().toString().isEmpty()) {
                             btnHospital.setEnabled(true);
@@ -336,7 +339,9 @@ public class TaskActivity extends BaseActivity {
                     if (!hospitalList.isEmpty()) {
                         String hospitalId = hospitalList.get(position).getHospitalId();
                         if (!TextUtils.isEmpty(hospitalId)) {
-                            if (!hospitalId.equals(currentReceiverHospitalId)) {
+                            if (hospitalId.equals("-1")) {
+                                trOutHospital.setVisibility(View.GONE);
+                            }else if (!hospitalId.equals(currentReceiverHospitalId)) {
                                 trOutHospital.setVisibility(View.VISIBLE);
                             } else {
                                 trOutHospital.setVisibility(View.GONE);
@@ -397,7 +402,7 @@ public class TaskActivity extends BaseActivity {
                         //txtDestTime.setText(timeFormat.format(new Date(Long.valueOf(taskInfo.getCarBackTime()))));
                         btnHospital.setEnabled(false);
                         _isEnd = true;
-                    } else if (!btnScene.isEnabled()) {
+                    } else if (!btnOut.isEnabled()) {
                         btnHospital.setEnabled(true);
                     }
                     if (taskInfo.getDestHospitalId() != null)
