@@ -278,13 +278,9 @@ public class TaskActivity extends BaseActivity {
                         if (this.txtArriveDate.getText().toString().isEmpty()) {
                             btnScene.setEnabled(true);
                         }
-                        if (txtDestDate.getText().toString().isEmpty()) {
-                            btnHospital.setEnabled(true);
-                        }
+                        btnHospital.setEnabled(TextUtils.isEmpty(txtDestDate.getText().toString()) && chkEmpty.isChecked());
                     } else if (btn.getId() == btnScene.getId()) {
-                        if (this.txtDestDate.getText().toString().isEmpty()) {
-                            btnHospital.setEnabled(true);
-                        }
+                        btnHospital.setEnabled(TextUtils.isEmpty(this.txtDestDate.getText().toString()));
                     }
 
                 } catch (ParseException e) {
@@ -402,7 +398,7 @@ public class TaskActivity extends BaseActivity {
                         //txtDestTime.setText(timeFormat.format(new Date(Long.valueOf(taskInfo.getCarBackTime()))));
                         btnHospital.setEnabled(false);
                         _isEnd = true;
-                    } else if (!btnOut.isEnabled()) {
+                    }  else if (!btnScene.isEnabled()) {
                         btnHospital.setEnabled(true);
                     }
                     if (taskInfo.getDestHospitalId() != null)
@@ -410,6 +406,9 @@ public class TaskActivity extends BaseActivity {
                     if (taskInfo.getEmptyReason() != null) {
                         Boolean empty = setSpinnerItemEnumSelectedByID(listEmptyReason, taskInfo.getEmptyReason());
                         chkEmpty.setChecked(empty);
+                    }
+                    if (chkEmpty.isChecked()) {
+                        btnHospital.setEnabled(!btnOut.isEnabled() && TextUtils.isEmpty(txtDestDate.getText().toString()));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -589,9 +588,18 @@ public class TaskActivity extends BaseActivity {
                         alert("请点击出车按钮填写出车时间");
                         return;
                     }
-                    if (txtArriveDate.getText().toString().isEmpty()) {
+                    // 如果不是跑空车,那么就需要填写到达现场时间
+                    if (!chkEmpty.isChecked() && txtArriveDate.getText().toString().isEmpty()) {
                         alert("请点击到达现场按钮填写到达现场时间");
                         return;
+                    }
+                    // 送达外院时间
+                    if (trOutHospital.getVisibility() == View.VISIBLE) {
+                        // 判断送达外院时间是否填写
+                        if (TextUtils.isEmpty(txtOutHospitalDate.getText().toString())) {
+                            alert("请点击送达外院按钮填写送达外院时间");
+                            return;
+                        }
                     }
                     if (txtDestDate.getText().toString().isEmpty()) {
                         alert("请点击送达医院按钮填写送达医院时间");
@@ -618,8 +626,9 @@ public class TaskActivity extends BaseActivity {
                     alert("请点击出车按钮填写出车时间");
                     return;
                 }
+                // 如果不是跑空车,那么就需要判断到达现场时间
                 // 判断到达现场时间
-                if (TextUtils.isEmpty(txtArriveDate.getText().toString())) {
+                if (!chkEmpty.isChecked() && TextUtils.isEmpty(txtArriveDate.getText().toString())) {
                     // 未到达现场
                     alert("请点击到达现场按钮填写到达现场时间");
                     return;
@@ -745,8 +754,15 @@ public class TaskActivity extends BaseActivity {
                         apsAdapter.clear();
                         apsAdapter.notifyDataSetChanged();
                     }
+                    // 其实这边还需要判断是否是送达外院,如果是送达外院,那么就需要判断送达外院时间是否为空
+                    // 以前的返回医院判断都是基于到达现场时间是否为空以及按钮是否可以点击来做判断,现在加了个送达外院按钮判断了.,但是现在依旧是基于到达时间来作为判断 2024/10/25
+
+                    // 勾选了空车 判断返回时间是空的,并且出车时间不为空,那么就直接可以点击.
+                    btnHospital.setEnabled(TextUtils.isEmpty(txtDestDate.getText().toString()) && !TextUtils.isEmpty(txtCarOutDate.getText().toString()));
                 } else {
                     setSpinnerItemEnumSelectedByID(listEmptyReason, "-1");
+                    // 没勾选了空车 判断返回时间是空的,并且到达现场时间不为空,那么就直接可以点击.
+                    btnHospital.setEnabled(TextUtils.isEmpty(txtDestDate.getText().toString()) && !TextUtils.isEmpty(txtArriveDate.getText().toString()));
                 }
                 listEmptyReason.setEnabled(isChecked);
                 btnAdd.setEnabled(!isChecked);
