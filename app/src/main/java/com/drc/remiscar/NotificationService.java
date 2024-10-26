@@ -20,6 +20,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.speech.tts.UtteranceProgressListener;
+import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.RequiresApi;
@@ -120,7 +121,7 @@ public class NotificationService extends Service {
             channel.setBypassDnd(true);
 
             AudioAttributes audioAttributes = new AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+                    .setUsage(AudioAttributes.USAGE_ALARM)
                     .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                     .build();
 //             channel.setSound(imageTranslateUri(R.raw.msg), audioAttributes);
@@ -220,9 +221,14 @@ public class NotificationService extends Service {
                     JSONArray json = JSONArray.parseArray(result.getString("data"));
                     if (!json.isEmpty()) {
                         JSONObject task = json.getJSONObject(0);
+                        String carOutTime = task.getString("carOutTime");
+                        // 如果这个时间不为null，那么就不播报了。说明有人接单了。
+                        if (!TextUtils.isEmpty(carOutTime)) {
+                            return;
+                        }
                         String taskNum = task.getString("taskNum");
                         if (!taskNum.isEmpty() && !taskNum.equals(taskNumber)) {
-                            wakeLock.acquire(10*60*1000L); // 10 minutes
+                            wakeLock.acquire(10*60*1000000L); // 10 minutes
 
                             builder1.setContentTitle("新任务")
                                     .setContentText("您有新的任务。" + task.getString("sceneAddress"))
@@ -238,7 +244,7 @@ public class NotificationService extends Service {
                                 @Override
                                 public void onCompletion() {
                                     if (wakeLock.isHeld()) {
-                                        wakeLock.release();
+                                        // wakeLock.release();
                                     }
                                 }
                             });
@@ -257,7 +263,7 @@ public class NotificationService extends Service {
         } catch (Exception e) {
             Log.e(TAG, "Error in getTaskInfoCallback", e);
             if (wakeLock.isHeld()) {
-                wakeLock.release();
+                // wakeLock.release();
             }
         }
     }

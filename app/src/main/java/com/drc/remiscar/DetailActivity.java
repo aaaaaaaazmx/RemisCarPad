@@ -83,7 +83,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DetailActivity extends Activity {
+public class DetailActivity extends BaseActivity {
 
     private static final Logger log = LoggerFactory.getLogger(DetailActivity.class);
     TextView labTaskNum = null;
@@ -127,6 +127,9 @@ public class DetailActivity extends Activity {
     private TabHost tabhost;
     private TabWidget tabs;
 
+    //_carOutTime
+    private String txtCarOutDate;
+
     String CITY = "怀化";
     String Lng = "";
     String Lat = "";
@@ -147,6 +150,8 @@ public class DetailActivity extends Activity {
     public final static String _Comeback = "http://%s:%s/gskj-cloud120/api/RemisCarPad/Comeback/%s";
     public final static String _ArrivedScene = "http://%s:%s/gskj-cloud120/api/RemisCarPad/ArrivedScene/%s";
     public final static String _OutCar = "http://%s:%s/gskj-cloud120/api/RemisCarPad/OutCar/%s";
+    // 送大外院时间 /api/RemisCarPad/OutHosp/{id}
+    public final static String _OutHosp = "http://%s:%s/gskj-cloud120/api/RemisCarPad/OutHosp/%s";
     public final static String _ENUM_EMPTY_REASON = "340";
     public final static String _ENUM_EMPTY_TOWHERE = "397";
     public static String _Url = "";
@@ -1136,6 +1141,8 @@ public class DetailActivity extends Activity {
     private void loadFromJson(JSONObject json) {
         if (json != null) {
             try {
+                // 获取carOutTime
+                txtCarOutDate = json.getString("carOutTime");
                 _alterNumber = json.getString("alterNumber");
                 _taskId = json.getString("id");
                 labTaskNum.setText(GetNoNullString(json.getString("taskNum")));
@@ -1243,19 +1250,6 @@ public class DetailActivity extends Activity {
             value = "";
         }
         return value;
-    }
-
-    public void alert(String msg) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(DetailActivity.this);
-        builder.setMessage(msg);
-        builder.setTitle("信息");
-        builder.setPositiveButton("确定", new android.content.DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-            }
-        });
-        if (!isFinishing() && !isDestroyed()) {
-            builder.create().show();
-        }
     }
 
 
