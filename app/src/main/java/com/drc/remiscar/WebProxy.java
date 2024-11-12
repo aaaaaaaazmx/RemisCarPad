@@ -10,6 +10,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import lombok.SneakyThrows;
 import okhttp3.MediaType;
@@ -31,7 +32,11 @@ public class WebProxy {
 	public static String getString(final String url, WebRequestType webRequestType, String arg) throws  IOException {
 		String retSrc = "";
 
-			OkHttpClient client = new OkHttpClient();
+			OkHttpClient client = new OkHttpClient().newBuilder()
+					.readTimeout(10, TimeUnit.SECONDS)
+					.readTimeout(10, TimeUnit.SECONDS)
+					.retryOnConnectionFailure(true)
+					.build();
 			Log.i("123123123 url", url);
             Request request = null;
             if(webRequestType == WebRequestType.Get) {

@@ -45,7 +45,9 @@ public class LoadingDialog {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setView(view);
 
-            dialog = builder.create();
+            if (null == dialog) {
+                dialog = builder.create();
+            }
             dialog.setCancelable(false);
         }
     }

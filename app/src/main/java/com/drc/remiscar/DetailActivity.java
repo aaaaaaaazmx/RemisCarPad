@@ -56,6 +56,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.maps.MapView;
+import com.drc.remiscar.util.ToastUtil;
 import com.drc.remiscar.util.VersionUtil;
 import com.drc.remiscar.widget.AvatarFloatView;
 import com.drc.remiscar.widget.BaseFloatView;
@@ -880,7 +881,8 @@ public class DetailActivity extends BaseActivity {
             } catch (IOException e) {
                 // Use a Handler to post on the main thread
                 new Handler(Looper.getMainLooper()).post(() -> {
-                    alert("网络异常：" + e.getMessage());
+                    // alert("网络异常：" + e.getMessage());
+                    ToastUtil.show("网络异常：" + e.getMessage());
                     writeFile("errorIO.log", e.toString());
                 });
             }

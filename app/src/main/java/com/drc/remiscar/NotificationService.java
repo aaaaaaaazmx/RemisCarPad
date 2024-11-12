@@ -224,6 +224,7 @@ public class NotificationService extends Service {
                         String carOutTime = task.getString("carOutTime");
                         // 如果这个时间不为null，那么就不播报了。说明有人接单了。
                         if (!TextUtils.isEmpty(carOutTime)) {
+                            ttsManager.stopSpeaking();
                             return;
                         }
                         String taskNum = task.getString("taskNum");
@@ -240,7 +241,7 @@ public class NotificationService extends Service {
                             taskNumber = taskNum;
 
                             // TTS播报新任务
-                            ttsManager.speak("您有新的任务", 3, new TTSManager.OnTTSCompletionListener() {
+                            ttsManager.speak("您有新的任务", 100, new TTSManager.OnTTSCompletionListener() {
                                 @Override
                                 public void onCompletion() {
                                     if (wakeLock.isHeld()) {

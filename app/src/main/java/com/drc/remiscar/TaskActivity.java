@@ -10,7 +10,9 @@ import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,6 +38,7 @@ import androidx.appcompat.widget.ViewUtils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.drc.remiscar.dialog.LoadingDialog;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -155,6 +158,9 @@ public class TaskActivity extends BaseActivity {
 
         @Override
         protected String doInBackground(String... params) {
+            new Handler(Looper.getMainLooper()).post(() -> {
+                LoadingDialog.show(BaseApplication.getContext(), "加载中...");
+            });
             // TODO Auto-generated method stub
             WebProxy.WebRequestType type = WebProxy.WebRequestType.Get;
             String arg = "";
@@ -204,6 +210,9 @@ public class TaskActivity extends BaseActivity {
             try {
                 result = WebProxy.getString(params[0], type, arg);
             } catch (IOException e) {
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    LoadingDialog.close();
+                });
                 writeFile("error.log", e.toString());
             }
             return result;
@@ -225,6 +234,9 @@ public class TaskActivity extends BaseActivity {
 
         @Override
         protected void onPostExecute(String result) {
+            new Handler(Looper.getMainLooper()).post(() -> {
+                LoadingDialog.show(BaseApplication.getContext(), "加载中...");
+            });
             // TODO Auto-generated method stub
             switch (method) {
                 case 0:
@@ -988,5 +1000,11 @@ public class TaskActivity extends BaseActivity {
             return dateTime.format(outputFormatter);
         }
         return "";
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        LoadingDialog.close();
     }
 }

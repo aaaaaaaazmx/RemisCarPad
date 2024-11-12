@@ -153,6 +153,18 @@ public class TTSManager implements TextToSpeech.OnInitListener {
         }
     }
 
+
+    // New stop method that clears the queue and stops the TTS
+    public void stopSpeaking() {
+        if (tts != null && (!messageQueue.isEmpty() || tts.isSpeaking())) {
+            tts.stop();  // Immediately stop speaking
+            messageQueue.clear();  // Clear the message queue
+           /* if (completionListener != null) {
+                completionListener.onCompletion();  // Notify that TTS has stopped
+            }*/
+        }
+    }
+
     private void retryInitialization() {
         // Retry after 10 seconds
         handler.postDelayed(this::initializeTTS, 10000);
