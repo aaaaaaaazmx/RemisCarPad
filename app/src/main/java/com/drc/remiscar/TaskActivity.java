@@ -39,6 +39,8 @@ import androidx.appcompat.widget.ViewUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.drc.remiscar.dialog.LoadingDialog;
+import com.lxj.xpopup.XPopup;
+import com.lxj.xpopup.core.CenterPopupView;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -107,6 +109,15 @@ public class TaskActivity extends BaseActivity {
 
     List<SysEnum> toWhereList =null;
 
+    private  CenterPopupView loadingPopup;
+    public  void show() {
+        // Check if the activity is not finishing or destroyed
+        if (!loadingPopup.isShow()) {
+            // Show the popup if it's not showing
+            loadingPopup.show();
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -114,6 +125,10 @@ public class TaskActivity extends BaseActivity {
         _taskNum = this.getIntent().getExtras().getString("taskNum");
         _alterNumber = this.getIntent().getExtras().getString("alterNumber");
         setContentView(R.layout.activity_task);
+        if (loadingPopup == null) {
+            loadingPopup = (CenterPopupView) new XPopup.Builder(TaskActivity.this)
+                    .asLoading("Loading...");
+        }
         GetControl();
         InitControl();
         GetData();
@@ -159,7 +174,7 @@ public class TaskActivity extends BaseActivity {
         @Override
         protected String doInBackground(String... params) {
             new Handler(Looper.getMainLooper()).post(() -> {
-                LoadingDialog.show(BaseApplication.getContext(), "加载中...");
+                show();
             });
             // TODO Auto-generated method stub
             WebProxy.WebRequestType type = WebProxy.WebRequestType.Get;
@@ -211,7 +226,7 @@ public class TaskActivity extends BaseActivity {
                 result = WebProxy.getString(params[0], type, arg);
             } catch (IOException e) {
                 new Handler(Looper.getMainLooper()).post(() -> {
-                    LoadingDialog.close();
+                    loadingPopup.dismiss();
                 });
                 writeFile("error.log", e.toString());
             }
@@ -235,7 +250,7 @@ public class TaskActivity extends BaseActivity {
         @Override
         protected void onPostExecute(String result) {
             new Handler(Looper.getMainLooper()).post(() -> {
-                LoadingDialog.show(BaseApplication.getContext(), "加载中...");
+                loadingPopup.dismiss();
             });
             // TODO Auto-generated method stub
             switch (method) {
@@ -374,6 +389,7 @@ public class TaskActivity extends BaseActivity {
     private void getTaskInfoCallback(String result) {
         if (result != null && !result.equals("")) {
             JSONObject jsonObject = JSONObject.parseObject(result);
+            btnSave.setEnabled(jsonObject!=null);
             if(jsonObject!=null) {
                 TaskInfo taskInfo = jsonObject.getJSONObject("data").toJavaObject(TaskInfo.class);
                 _taskInfo = taskInfo;
@@ -915,6 +931,7 @@ public class TaskActivity extends BaseActivity {
             alert("出车时间不能晚于送达医院时间");
             return;
         }
+        if (null == _taskInfo) return;
         taskInfo.setCarNumber(_carNumber);
         taskInfo.setCarLic(_taskInfo.getCarLic());
         taskInfo.setSceneAddress(_taskInfo.getSceneAddress());
@@ -1000,11 +1017,5 @@ public class TaskActivity extends BaseActivity {
             return dateTime.format(outputFormatter);
         }
         return "";
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        LoadingDialog.close();
     }
 }

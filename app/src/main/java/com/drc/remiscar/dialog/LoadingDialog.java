@@ -31,7 +31,7 @@ public class LoadingDialog {
         dialog.show();
     }
 
-    public static void close() {
+    public static void dismiss() {
         if (dialog != null) {
             dialog.dismiss();
         }

@@ -56,6 +56,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.maps.MapView;
+import com.drc.remiscar.dialog.LoadingDialog;
 import com.drc.remiscar.util.ToastUtil;
 import com.drc.remiscar.util.VersionUtil;
 import com.drc.remiscar.widget.AvatarFloatView;
@@ -859,7 +860,6 @@ public class DetailActivity extends BaseActivity {
         @Override
         protected String doInBackground(String... params) {
             // TODO Auto-generated method stub
-
             if (params[1].equals("getTaskInfo")) {
                 method = 0;
             } else if (params[1].equals("getAddressLocation")) {

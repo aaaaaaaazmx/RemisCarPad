@@ -103,9 +103,9 @@ public class UpdateManager {
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public void checkUpdate() {
-        if (!isAutoCheck) {
+        /*if (!isAutoCheck) {
             LoadingDialog.show(context, R.string.layout_version_checking);
-        }
+        }*/
         //getNewVersion();
 
         String url = String.format(DetailActivity._GetNewVersion, DetailActivity._ServerIP, DetailActivity._ServerPort, 0, VersionUtil.getVersionCode(this.context));
@@ -132,14 +132,14 @@ public class UpdateManager {
         RetrofitRequest.sendGetRequest(url, new RetrofitRequest.ResultHandler(context) {
             @Override
             public void onBeforeResult() {
-                LoadingDialog.close();
+                LoadingDialog.dismiss();
             }
 
             @Override
             public void onResult(String response) {
                 if (response == null || response.trim().length() == 0) {
                     //Toast.makeText(context, R.string.layout_version_no_new, Toast.LENGTH_SHORT).show();
-                    LoadingDialog.close();
+                    LoadingDialog.dismiss();
                     return;
                 }
                 try {
@@ -154,21 +154,21 @@ public class UpdateManager {
                         if (data != null && data.getString("appUrl") != null && !data.getString("appUrl").isEmpty()) {
                             String url = data.getString("appUrl");
                             newFileName = data.getString("appFileName");
-                            LoadingDialog.close();
+                            LoadingDialog.dismiss();
                             showUpdateDialog(url,newFileName);
                         }else
-                            LoadingDialog.close();
+                            LoadingDialog.dismiss();
                     }else
-                        LoadingDialog.close();
+                        LoadingDialog.dismiss();
                 } catch (Exception e) {
 //                    Toast.makeText(context, R.string.layout_version_no_new, Toast.LENGTH_SHORT).show();
-                    LoadingDialog.close();
+                    LoadingDialog.dismiss();
                 }
             }
 
             @Override
             public void onAfterFailure() {
-                LoadingDialog.close();
+                LoadingDialog.dismiss();
 //                if (!isAutoCheck) {
 //                    Toast.makeText(context, R.string.layout_version_error, Toast.LENGTH_SHORT).show();
 //                }
@@ -209,11 +209,11 @@ public class UpdateManager {
                     String url = data.getString("appUrl");
                     showUpdateDialog(url,newFileName);
                 } else
-                    LoadingDialog.close();
+                    LoadingDialog.dismiss();
             } else
-                LoadingDialog.close();
+                LoadingDialog.dismiss();
         } else
-            LoadingDialog.close();
+            LoadingDialog.dismiss();
     }
 
     /**

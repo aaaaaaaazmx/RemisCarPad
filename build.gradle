@@ -22,6 +22,7 @@ buildscript {
 }
 allprojects {
     repositories {
+        maven { url 'https://jitpack.io' }
         maven{ url'https://maven.aliyun.com/nexus/content/groups/public/' }
         maven { url 'https://developer.huawei.com/repo/' }
         jcenter { url 'https://maven.aliyun.com/nexus/content/repositories/jcenter' }
