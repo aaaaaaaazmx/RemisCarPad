@@ -38,7 +38,7 @@ import androidx.appcompat.widget.ViewUtils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.drc.remiscar.dialog.LoadingDialog;
+import com.drc.remiscar.util.ToastUtil;
 import com.lxj.xpopup.XPopup;
 import com.lxj.xpopup.core.CenterPopupView;
 
@@ -109,7 +109,7 @@ public class TaskActivity extends BaseActivity {
 
     List<SysEnum> toWhereList =null;
 
-    private  CenterPopupView loadingPopup;
+    private CenterPopupView loadingPopup;
     public  void show() {
         // Check if the activity is not finishing or destroyed
         if (!loadingPopup.isShow()) {
@@ -159,6 +159,7 @@ public class TaskActivity extends BaseActivity {
             e.printStackTrace();
         }
 
+        show();
         url = String.format(DetailActivity._GetTaskAndPat_URL, DetailActivity._ServerIP, DetailActivity._ServerPort, _taskId);
         try {
             loadJSONStringTask loadJSON = new loadJSONStringTask();
@@ -173,9 +174,6 @@ public class TaskActivity extends BaseActivity {
 
         @Override
         protected String doInBackground(String... params) {
-            new Handler(Looper.getMainLooper()).post(() -> {
-                show();
-            });
             // TODO Auto-generated method stub
             WebProxy.WebRequestType type = WebProxy.WebRequestType.Get;
             String arg = "";
@@ -227,6 +225,8 @@ public class TaskActivity extends BaseActivity {
             } catch (IOException e) {
                 new Handler(Looper.getMainLooper()).post(() -> {
                     loadingPopup.dismiss();
+                    ToastUtil.show("网络异常：" + e.getMessage());
+                    if (method == 0) finish();
                 });
                 writeFile("error.log", e.toString());
             }
@@ -249,12 +249,10 @@ public class TaskActivity extends BaseActivity {
 
         @Override
         protected void onPostExecute(String result) {
-            new Handler(Looper.getMainLooper()).post(() -> {
-                loadingPopup.dismiss();
-            });
             // TODO Auto-generated method stub
             switch (method) {
                 case 0:
+                    loadingPopup.dismiss();
                     getTaskInfoCallback(result);
                     break;
                 case 1:
@@ -264,6 +262,7 @@ public class TaskActivity extends BaseActivity {
                     getEnumCallback(result);
                     break;
                 case 3:
+                    loadingPopup.dismiss();
                     saveTaskInfoCallback(result);
                     break;
                 case 4:
@@ -276,6 +275,7 @@ public class TaskActivity extends BaseActivity {
                     UpdateTime(txtDestDate, btnHospital, result);
                     break;
                 case 7:
+                    loadingPopup.dismiss();
                     taskOverCallback(result);
                     break;
                 case 8:
@@ -390,6 +390,9 @@ public class TaskActivity extends BaseActivity {
         if (result != null && !result.equals("")) {
             JSONObject jsonObject = JSONObject.parseObject(result);
             btnSave.setEnabled(jsonObject!=null);
+            btnOver.setEnabled(jsonObject!=null);
+            btnAdd.setEnabled(jsonObject!=null);
+            btnDel.setEnabled(jsonObject!=null);
             if(jsonObject!=null) {
                 TaskInfo taskInfo = jsonObject.getJSONObject("data").toJavaObject(TaskInfo.class);
                 _taskInfo = taskInfo;
@@ -637,6 +640,7 @@ public class TaskActivity extends BaseActivity {
 //                        alert("请输入病人信息");
 //                        return;
 //                    }
+                    show();
                     String url = String.format(DetailActivity._TaskOver, DetailActivity._ServerIP, DetailActivity._ServerPort, _taskId);
                     SaveTaskInfo(url, "TaskOver");
                 } catch (Exception e) {
@@ -817,6 +821,7 @@ public class TaskActivity extends BaseActivity {
 //                    alert("请输入病人信息");
 //                    return;
 //                }
+                show();
                 String url = String.format(DetailActivity._SaveTaskInfo, DetailActivity._ServerIP, DetailActivity._ServerPort);
                 SaveTaskInfo(url, "SaveTaskInfo");
             }
@@ -1017,5 +1022,13 @@ public class TaskActivity extends BaseActivity {
             return dateTime.format(outputFormatter);
         }
         return "";
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (null != loadingPopup) {
+            loadingPopup.dismiss();
+        }
     }
 }
